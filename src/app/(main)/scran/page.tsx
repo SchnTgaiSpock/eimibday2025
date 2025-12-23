@@ -1,6 +1,6 @@
 "use client"
 
-import { scrans, scranMatches, Score, getFeedback, getPrice, getCountry, getName, getSubmittedBy } from "@/data/scran";
+import { scrans, scranMatches, Score, getFeedback, getPrice, getCountry, getName, getSubmittedBy, getCopyText } from "@/data/scran";
 import { useState } from "react";
 import { ScranDisplay } from "./scranDisplay";
 import { sleep } from "@/util/sleep";
@@ -16,7 +16,7 @@ export default function Messages() {
 
   const renderMenu = () => {
     return <div className="scran-menu">
-      <h1 className="scran-title">SCRHAMDLE<sup>TM</sup></h1>
+      <h1 className="scran-title">SCRHAMDLE</h1>
       <p className="scran-subtitle">THE THRILLING <s>DAILY</s> GAME OF FOOD COMPARISON</p>
       <hr />
       <button className="scran-menu-play" onClick={() => {
@@ -96,6 +96,7 @@ export default function Messages() {
         <button
           className="scran-clipboard scran-menu-box gray"
           onClick={() => {
+            navigator.clipboard.writeText(getCopyText(scores))
             setFeedback("Copied result to clipboard")
           }}
         >

@@ -44,7 +44,7 @@ export function getPrice(scran: Scran) {
 
 export function getCopyText(score: Score[]) {
     // 🟥🟥🟩🟩🟩🟥🟥🟩🟩🟩 6/10 | Practice | https://scrandle.com
-    return `${score.map(s => s ? "🟩" : "🟥")} ${score.reduce((acc, curr) => (curr ? 1 : 0) + acc, 0)}/${score.length} | https://isami-industries.com`
+    return `${score.map(s => s ? "🟩" : "🟥").join("")} ${score.reduce((acc, curr) => (curr ? 1 : 0) + acc, 0)}/${score.length} | https://isami-industries.com`
 }
 
 export const scrans: Scran[] = [

@@ -3,10 +3,12 @@ import { ProfilePicture } from "./ProfilePicture";
 export function Navbar() {
   return <nav>
     <div className="nav-item logo">
-      Isami<br />Industries
+      <img src="/isami-industries.png" alt="Isami Industries" />
     </div>
     <div className="nav-item">
-      <ProfilePicture url="/pfp.png" initials="EI" />
+      <div className="profile-picture-background">
+        <ProfilePicture url="/pfp.png" initials="EI" />
+      </div>
     </div>
     <svg
       viewBox="0 3 14 11"

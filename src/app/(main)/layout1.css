@@ -81,17 +81,21 @@ nav {
     background: linear-gradient(177deg, var(--theme-primary) 0%, var(--theme-primary-gradient-1) 60%, var(--theme-primary-gradient-2) 100%);
     color: var(--theme-text-light);
     box-shadow: 2px 2px 7px 0px #21293070;
-    padding: 1.5rem;
     display: flex;
     position: relative;
     align-items: center;
     z-index: 3;
 
     .logo {
-        font-size: 2.5rem;
-        line-height: 1.6rem;
+        margin: 1.25rem;
+        padding: 0;
         margin-right: auto;
-        font-weight: bold;
+        display: flex;
+
+        img {
+            height: 80px;
+
+        }
     }
 
     svg {
@@ -103,26 +107,27 @@ nav {
     }
 }
 
-.profile-picture {
+.profile-picture-background {
+    background: linear-gradient(165deg, rgba(191, 245, 29, 1) 0%, rgba(197, 252, 25, 1) 49%, rgba(255, 197, 230, 1) 51%, rgba(255, 219, 238, 1) 100%);
     border-radius: 100%;
-    width: 3rem;
-    height: 3rem;
-    border-width: 4px;
-    border-style: solid;
-    border-top-color: var(--theme-green);
-    border-left-color: var(--theme-green);
-    border-bottom-color: var(--theme-pink);
-    border-right-color: var(--theme-pink);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 2rem;
-    overflow: hidden;
+    margin: 1.5rem;
 
-    img {
-        width: 100%;
-        object-fit: fill;
+    .profile-picture {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 100%;
+        border: 8px solid transparent;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 2rem;
+        overflow: hidden;
+
+        img {
+            width: 100%;
+            object-fit: fill;
+        }
     }
 }
 
@@ -210,26 +215,35 @@ nav {
         font-size: 1.5rem;
         border-radius: 1rem;
         box-shadow: 2px 2px 9px 0px #21293070;
+        overflow: hidden;
 
         .actions {
             display: flex;
             flex-direction: row;
             margin-top: 2rem;
 
-            a,
-            button {
-                color: var(--theme-text-light);
-                text-decoration: none;
-                margin: 0px;
-                background-color: var(--theme-secondary-dark);
-                border: 0;
-                border-radius: 0.5rem;
-                padding: 0.5rem;
-                font-family: inherit;
-                font-size: 1.2rem;
+            .card-button {
+                filter: drop-shadow(2px 2px 3px #21293050);
 
-                &:hover {
-                    background-color: color-mix(in srgb, var(--theme-secondary-dark) 60%, transparent)
+                a {
+                    display: block;
+                    position: relative;
+                    color: var(--theme-text-light);
+                    text-decoration: none;
+                    margin: 0px;
+                    background-color: var(--theme-secondary-dark);
+                    border: 0;
+                    left: -6rem;
+                    width: 150px;
+                    padding: 0.2rem;
+                    padding-left: 6rem;
+                    font-family: inherit;
+                    clip-path: polygon(88% 0, 100% 50%, 88% 100%, 0 100%, 0 0);
+                    transition: left 0.08s ease-in-out;
+
+                    &:hover {
+                        left: -2rem;
+                    }
                 }
             }
         }
@@ -244,20 +258,8 @@ nav {
     gap: 4.5rem;
     height: 100%;
     overflow: scroll;
-    /* 
-    >* {
-        background-color: var(--theme-pink);
-        border-radius: 0.5rem;
-        padding: 1rem;
-
-        &.selected {
-            background-color: var(--theme-green);
-        }
-
-        >p {
-            margin: 0
-        }
-    } */
+    scrollbar-width: thin;
+    scroll-behavior: smooth;
 }
 
 .announcements {
@@ -270,16 +272,30 @@ nav {
     min-width: 400px;
 }
 
-.paper {
-    --height: calc(100vh - 9rem);
+.paper-wrapper {
+    --height: calc(100vh - 10rem);
     --width: calc(var(--height) * 0.7);
-    box-shadow: 5px 5px 7px 2px #BEBEBE;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
     min-width: var(--width);
     width: var(--width);
     max-width: var(--width);
     height: var(--height);
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    box-shadow: 5px 5px 7px 2px #BEBEBE;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.paper {
+    z-index: 100;
+    --height: calc(100vh - 9rem);
+    --width: calc(var(--height) * 0.7);
+    min-width: var(--width);
+    width: var(--width);
+    max-width: var(--width);
+    min-height: 100%;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
 }
@@ -289,6 +305,7 @@ nav {
     padding-left: 6rem;
     overflow: hidden;
     height: 4.3rem;
+    min-height: 4.3rem;
     display: flex;
     align-items: end;
     justify-content: end;
@@ -313,17 +330,17 @@ nav {
 }
 
 .paper-lines {
-    --paper-line-height: 25px;
+    --paper-line-height: 23px;
     --paper-line-color: #9198e5;
     padding-left: 6rem;
-    line-height: 25px;
+    line-height: var(--paper-line-height);
     padding-top: 5px;
     font-size: 18px;
-    overflow: hidden;
     background: repeating-linear-gradient(#9198e5b0,
-            #9198e5b0 2px,
+            #9198e5b0 1.9px,
             transparent 2px,
-            transparent var(--paper-line-height));
+            transparent calc(var(--paper-line-height) - 0.1px),
+            #9198e5b0 var(--paper-line-height));
     position: relative;
     flex: 1;
 
@@ -354,14 +371,14 @@ nav {
     z-index: -1;
     background-color: rgb(255, 254, 251);
 
-    &::before {
+    &.noise::before {
         content: '';
         position: absolute;
         z-index: -1;
-        top: 0;
+        top: -100%;
         left: 0;
         width: 100%;
-        height: 100%;
+        height: 300%;
         filter: url(#paper-noise);
         opacity: 0.8;
         pointer-events: none;
@@ -369,14 +386,20 @@ nav {
 }
 
 .paper-image {
-    position: absolute;
-    left: 30px;
-    width: calc(100% - 60px);
+    position: relative;
+    left: -5rem;
+    width: calc(var(--width) - 2rem);
     z-index: 10;
+    margin-bottom: 1rem;
 
-    img {
+    img,
+    video,
+    iframe {
         width: 100%;
-        box-shadow: 2px 2px 9px 0px #21293070;
+        max-width: 100%;
+        max-height: 400px;
+        filter: drop-shadow(2px 2px 4px #21293040) drop-shadow(3px 3px 8px #21293050);
+        object-fit: contain;
     }
 }
 
@@ -512,8 +535,9 @@ nav {
         .scran-title {
             font-family: "Barlow Condensed";
             font-size: 8rem;
-            line-height: 7rem;
-            margin: 0px 3rem;
+            line-height: 8rem;
+            margin: 0;
+            margin-top: -1.25rem;
             background: -webkit-linear-gradient(#d52222, #b41d1d);
             background-clip: text;
             -webkit-background-clip: text;
@@ -550,12 +574,12 @@ nav {
         }
 
         .scran-subtitle {
-            position: relative;
             font-family: "M PLUS Rounded 1c";
             font-size: 1.2rem;
             line-height: 1.7rem;
             margin: 0px;
-            top: -2px;
+            margin-top: -0.75rem;
+            margin-bottom: -0.25rem;
             background: -webkit-linear-gradient(#c6c6c6, #303030);
             background-clip: text;
             -webkit-background-clip: text;
@@ -678,13 +702,15 @@ nav {
                     line-height: 120%
                 }
 
-                .scran-review-subtitle, .scran-review-country-price {
+                .scran-review-subtitle,
+                .scran-review-country-price {
                     color: rgb(33, 37, 41);
                     font-size: 0.75rem;
                     line-height: 150%;
                 }
 
-                .scran-review-country-price, .scran-review-percent {
+                .scran-review-country-price,
+                .scran-review-percent {
                     padding-left: 4px;
                     padding-right: 4px;
                 }
