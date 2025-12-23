@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { Sidebar } from "./Sidebar";
+import { messages } from "@/data/messages";
 
 function Announcements() {
   return <div className="announcements">
@@ -31,9 +32,12 @@ export default function Home() {
       <div className="cards">
         <h2 style={{ margin: 0 }}>Welcome Back, Eimi</h2>
         <Card>
-          <h2>You have 3 new messages</h2>
+          <h2>You have {messages.length} new messages</h2>
           <div className="actions">
-            <a href="/layout1/messages">View</a>
+            <div className="card-button">
+              
+            <a href="/messages">Go</a>
+            </div>
           </div>
         </Card>
       </div>

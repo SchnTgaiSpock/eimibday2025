@@ -8,27 +8,35 @@ interface LinePaperProps {
 export function LinePaper({
   message
 }: LinePaperProps) {
+  const isVideo = message.imageUrl?.includes("vimeo.com")
+  const isYoutube = message.imageUrl?.includes("youtube.com")
+  const style = { transform: `rotate(${hash(message.text, 70) / 10 - 4}deg)` }
+  // TODO: preload -> medium, 200w_s -> giphy.gif
   return <div
-    className="paper"
+    className="paper-wrapper"
     style={{
-      transform: `rotate(${hash(message.content, 30)/10 - 1}deg)`
+      transform: `translateZ(0) rotate(${hash(message.text, 300) / 100 - 1.5}deg)`
+    }}
+    onScroll={e => {
+      e.stopPropagation()
     }}
   >
-    <div className="paper-header">
-      <div className="paper-background"></div>
-      <p>From: {message.author}</p>
-    </div>
-    <div className="paper-lines">
-      <div className="paper-background"></div>
-      {message.content.split("\n").map(s => <p key={s}>{s.trim()}</p>)}
-      {!!message.imageUrl && <div className="paper-image">
-        <img
-          src={message.imageUrl}
-          style={{
-            transform: `rotate(${hash(message.content, 130)/10 - 6}deg)`
-          }}
-        />
-      </div>}
+    <div
+      className="paper"
+    >
+      <div className="paper-header">
+        <div className="paper-background"></div>
+        <p>From: {message.from}</p>
+      </div>
+      <div className="paper-lines">
+        <div className="paper-background noise"></div>
+        <div dangerouslySetInnerHTML={{ __html: message.text }} />
+        {!!message.imageUrl && <div className="paper-image" style={style}>
+          {isVideo && <video controls><source src={message.imageUrl} type="video/mp4" /></video>}
+          {isYoutube && <iframe width="533" height="400" src={message.imageUrl} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>}
+          {!isVideo && !isYoutube && <img src={message.imageUrl} />}
+        </div>}
+      </div>
     </div>
   </div>
 } 
