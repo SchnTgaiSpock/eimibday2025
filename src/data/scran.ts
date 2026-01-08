@@ -61,6 +61,8 @@ export const scrans: Scran[] = [
         percent: 0,
     },
 ]
+
+// Each game consists of 10 matches between 2 scrans
 export type ScranGame = [number, number][]
 export const scranGames: ScranGame[] = [
     [
