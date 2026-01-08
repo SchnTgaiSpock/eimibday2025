@@ -16,5 +16,6 @@ export function Sidebar() {
     <SidebarLink currentPath={path} text="Dashboard" href="/" />
     <SidebarLink currentPath={path} text="Messages" href="/messages" />
     <SidebarLink currentPath={path} text="Tasks" href="/scran" />
+    <SidebarLink currentPath={path} text="Credits" href="/credits" />
   </div>
 }
