@@ -23,7 +23,7 @@ export function ScranDisplay({
             backgroundImage: `url(${scran.imageUrl})`,
             backgroundSize: scran.backgroundSize ?? 'cover',
             backgroundRepeat: "no-repeat",
-            backgroundPosition: "center",
+            backgroundPosition: scran.backgroundPosition ?? 'center',
         }}
         onClick={() => onClick(isWinner)}
     >

@@ -11,6 +11,7 @@ export interface Scran {
     year?: number
     price?: number // GBP
     backgroundSize?: 'cover' | 'contain'
+    backgroundPosition?: string
 
     percent: number
 }
@@ -42,7 +43,7 @@ export function getCountryFlagClass(scran: Scran) {
 }
 
 export function getLocation(scran: Scran) {
-    return scran.location ?? "Isami Industries HQ"
+    return scran.location ?? ""
 }
 
 export function getYear(scran: Scran) {
