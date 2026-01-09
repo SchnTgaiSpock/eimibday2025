@@ -1,4 +1,3 @@
-
 export function getFlagClass(country: string) {
     const iso_3166_1_alpha = {
         abw: "aw",
@@ -263,6 +262,6 @@ export function getFlagClass(country: string) {
         ...other_gb
     }
 
-    return flagnames_unified[country.toLowerCase()] ? 'fi fi-' + flagnames_unified[country.toLowerCase()] : ''
+    return flagnames_unified[(country ?? '').toLowerCase()] ? 'fi fi-' + flagnames_unified[country.toLowerCase()] : ''
 }
 
