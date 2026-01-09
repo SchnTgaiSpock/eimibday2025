@@ -485,6 +485,7 @@ nav {
                 position: relative;
                 border: 0.75rem solid var(--scran-gray);
                 cursor: pointer;
+                background-color: rgba(0, 0, 0, 0.75);
 
                 &:hover {
                     border: 0.75rem solid var(--scran-yellow);
@@ -518,6 +519,19 @@ nav {
                         margin-bottom: 0.5rem;
                         font-weight: bold;
                         font-size: 1.25rem;
+                    }
+                    .scran-submitter {
+                        font-style: italic;
+                        font-size: 0.75rem;
+                        font-weight: bold;
+                    }
+
+                    .scran-submitter:before {
+                        content: "Submitted by:\A"; 
+                        white-space: pre;
+                        font-size: 75%;
+                        font-weight: normal;
+                        font-style: normal;
                     }
                 }
             }

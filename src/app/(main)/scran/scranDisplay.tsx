@@ -1,5 +1,6 @@
 import { forwardRef } from "react"
-import { getCountry, getDescription, getLocation, getName, getPrice, getSubmittedBy, getYear, Scran } from "../../../data/scran"
+import { getCountry, getCountryFlagSpaces, getCountryFlagClass, getDescription, getLocation, getName, getPrice, getPercent, getSubmittedBy, getYear, Scran } from "../../../data/scran"
+import "flag-icons/css/flag-icons.min.css";
 
 interface ScranDisplayProps {
     scran: Scran
@@ -22,7 +23,7 @@ export function ScranDisplay({
             backgroundImage: `url(${scran.imageUrl})`,
             backgroundSize: scran.backgroundSize ?? 'cover',
             backgroundRepeat: "no-repeat",
-            backgroundPosition: "50% 50%",
+            backgroundPosition: scran.backgroundPosition ?? 'center',
         }}
         onClick={() => onClick(isWinner)}
     >
@@ -31,9 +32,9 @@ export function ScranDisplay({
             fontSize: showPercent ? "2.5rem" : "8rem",
             opacity: showPercent ? 1 : 0
         }}>
-            {showPercent && scran.percent + "%"}
+            {showPercent && getPercent(scran) + "%"}
         </div>
-        <div className="scran-header">{getLocation(scran)}, {getYear(scran)} <span style={{ float: "right" }}>{getCountry(scran)}</span></div>
+        <div className="scran-header">{getLocation(scran)}, {getYear(scran)} <span style={{ float: "right" }}>{getCountry(scran)}{getCountryFlagSpaces(scran)}<span className={getCountryFlagClass(scran)}/></span></div>
         <div className="scran-footer" style={{
             display: 'flex',
             flexDirection: side === 'right' ? 'row' : 'row-reverse',
@@ -45,7 +46,12 @@ export function ScranDisplay({
                 <p className="scran-name">{getName(scran)}</p>
                 <p>{getDescription(scran)}{getPrice(scran)}</p>
             </div>
-            <div style={{ marginTop: "auto", fontStyle: "italic" }}>Submitted by {getSubmittedBy(scran)}</div>
+            <div className="scran-submitter" style={{
+                textAlign: side === 'right' ? 'right' : 'left',
+                marginTop: "auto", marginBottom: "auto"
+            }}>
+                {getSubmittedBy(scran)}
+            </div>
         </div>
     </div>
 }

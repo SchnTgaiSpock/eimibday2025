@@ -1,6 +1,6 @@
 "use client"
 
-import { scrans, scranGames, Score, getFeedback, getPrice, getCountry, getName, getSubmittedBy, getCopyText, ScranGame } from "@/data/scran";
+import { scrans, scranGames, Score, getFeedback, getPrice, getPercent, getCountry, getName, getSubmittedBy, getCopyText, ScranGame } from "@/data/scran";
 import { useEffect, useState } from "react";
 import { ScranDisplay } from "./scranDisplay";
 import { sleep } from "@/util/sleep";
@@ -113,14 +113,14 @@ export default function Messages() {
         <ScranDisplay
           scran={scranLeft}
           side="left"
-          isWinner={scranLeft.percent >= scranRight.percent}
+          isWinner={getPercent(scranLeft) >= getPercent(scranRight)}
           showPercent={animationStage !== 'shown'}
           onClick={onClick}
         />
         <ScranDisplay
           scran={scranRight}
           side="right"
-          isWinner={scranRight.percent >= scranLeft.percent}
+          isWinner={getPercent(scranRight) >= getPercent(scranLeft)}
           showPercent={animationStage !== 'shown'}
           onClick={onClick}
         />
@@ -167,8 +167,9 @@ export default function Messages() {
               <p className="scran-review-name">{getName(left)}</p>
               <p className="scran-review-country-price">{getCountry(left)} • {getPrice(left)}</p>
               <p className="scran-review-country-price">Submitted by {getSubmittedBy(left)}</p>
-              <p className={`scran-review-percent ${left.percent > right.percent ? "green" : "red"}`}>{left.percent}%</p>
-              {left.percent > right.percent === !!scores[selectedReview] && <p className="scran-review-subtitle">YOU PICKED THIS</p>}
+              {/* TODO: this logic does not work in the event of a tie */}
+              <p className={`scran-review-percent ${getPercent(left) >= getPercent(right) ? "green" : "red"}`}>{getPercent(left)}%</p>
+              {getPercent(left) > getPercent(right) === !!scores[selectedReview] && <p className="scran-review-subtitle">YOU PICKED THIS</p>}
             </div>
           </div>
           <div className="scran-review-side">
@@ -177,8 +178,9 @@ export default function Messages() {
               <p className="scran-review-name">{getName(right)}</p>
               <p className="scran-review-country-price">{getCountry(right)} • {getPrice(right)}</p>
               <p className="scran-review-country-price">Submitted by {getSubmittedBy(right)}</p>
-              <p className={`scran-review-percent ${right.percent > left.percent ? "green" : "red"}`}>{right.percent}%</p>
-              {right.percent > left.percent === !!scores[selectedReview] && <p className="scran-review-subtitle">YOU PICKED THIS</p>}
+              <p className={`scran-review-percent ${getPercent(right) > getPercent(left) ? "green" : "red"}`}>{getPercent(right)}%</p>
+              {/* TODO: this logic does not work in the event of a tie */}
+              {getPercent(right) > getPercent(left) === !!scores[selectedReview] && <p className="scran-review-subtitle">YOU PICKED THIS</p>}
             </div>
           </div>
         </div>
