@@ -1,5 +1,5 @@
 import { forwardRef } from "react"
-import { getCountry, getDescription, getLocation, getName, getPrice, getSubmittedBy, getYear, Scran } from "../../../data/scran"
+import { getCountry, getDescription, getLocation, getName, getPrice, getPercent, getSubmittedBy, getYear, Scran } from "../../../data/scran"
 
 interface ScranDisplayProps {
     scran: Scran
@@ -31,7 +31,7 @@ export function ScranDisplay({
             fontSize: showPercent ? "2.5rem" : "8rem",
             opacity: showPercent ? 1 : 0
         }}>
-            {showPercent && scran.percent + "%"}
+            {showPercent && getPercent(scran) + "%"}
         </div>
         <div className="scran-header">{getLocation(scran)}, {getYear(scran)} <span style={{ float: "right" }}>{getCountry(scran)}</span></div>
         <div className="scran-footer" style={{

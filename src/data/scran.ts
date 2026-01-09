@@ -27,8 +27,13 @@ export function getName(scran: Scran) {
 export function getDescription(scran: Scran) {
     return scran.description ? scran.description + " • " : ""
 }
+
 export function getCountry(scran: Scran) {
-    return scran.country ?? "Phase World"
+    return (scran.country ?? "")
+}
+
+export function getCountryFlagClass(scran: Scran) {
+    return getFlagClass(scran.country)
 }
 
 export function getLocation(scran: Scran) {
@@ -41,6 +46,10 @@ export function getYear(scran: Scran) {
 
 export function getPrice(scran: Scran) {
     return scran.price === 0 ? "FREE" : scran.price ? "£" + scran.price.toFixed(2) : "No price data"
+}
+
+export function getPercent(scran: Scran) {
+    return scran.percent.toFixed(2)
 }
 
 export function getCopyText(score: Score[], mode: string) {
