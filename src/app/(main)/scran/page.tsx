@@ -167,6 +167,7 @@ export default function Messages() {
               <p className="scran-review-name">{getName(left)}</p>
               <p className="scran-review-country-price">{getCountry(left)} • {getPrice(left)}</p>
               <p className="scran-review-country-price">Submitted by {getSubmittedBy(left)}</p>
+              {/* TODO: this logic does not work in the event of a tie */}
               <p className={`scran-review-percent ${getPercent(left) >= getPercent(right) ? "green" : "red"}`}>{getPercent(left)}%</p>
               {getPercent(left) > getPercent(right) === !!scores[selectedReview] && <p className="scran-review-subtitle">YOU PICKED THIS</p>}
             </div>
@@ -178,6 +179,7 @@ export default function Messages() {
               <p className="scran-review-country-price">{getCountry(right)} • {getPrice(right)}</p>
               <p className="scran-review-country-price">Submitted by {getSubmittedBy(right)}</p>
               <p className={`scran-review-percent ${getPercent(right) > getPercent(left) ? "green" : "red"}`}>{getPercent(right)}%</p>
+              {/* TODO: this logic does not work in the event of a tie */}
               {getPercent(right) > getPercent(left) === !!scores[selectedReview] && <p className="scran-review-subtitle">YOU PICKED THIS</p>}
             </div>
           </div>
