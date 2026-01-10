@@ -38,29 +38,35 @@ export default function Credits() {
               Liquid Skelie<br />
               MisterYura
             </p>
-            <p>
-              <strong>Messages</strong>
-            </p>
-            <p>
-              {messages.map((m, i) => <Fragment key={m.id}>
-                {m.from}
-                {i !== messages.length - 1 && <br />}
-              </Fragment>)}
-            </p>
-            <p>
-              <strong>Scrans</strong>
-            </p>
-            <p>
-              {
-                (
-                  Array.from(
-                    new Set(scrans.filter(scran => scran.submittedBy != null).map(scran => scran.submittedBy))
-                  ).sort(function (a, b) {return (a?.toLowerCase() ?? '').localeCompare(b?.toLowerCase() ?? '')})
-                ).map((m, i) => <Fragment key={i}>
-                {m !== '' && m}
-                {i !== messages.length - 1 && <br />}
-              </Fragment>)}
-            </p>
+            <div className="row">
+              <div className="col">
+                <p>
+                  <strong>Messages</strong>
+                </p>
+                <p>
+                  {messages.map((m, i) => <Fragment key={m.id}>
+                    {m.from}
+                    {i !== messages.length - 1 && <br />}
+                  </Fragment>)}
+                </p>
+              </div>
+              <div className="col">
+                <p>
+                  <strong>Scrans</strong>
+                </p>
+                <p>
+                  {
+                    (
+                      Array.from(
+                        new Set(scrans.filter(scran => scran.submittedBy != null).map(scran => scran.submittedBy))
+                      ).sort(function (a, b) { return (a?.toLowerCase() ?? '').localeCompare(b?.toLowerCase() ?? '') })
+                    ).map((m, i) => <Fragment key={i}>
+                      {m !== '' && m}
+                      {i !== messages.length - 1 && <br />}
+                    </Fragment>)}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

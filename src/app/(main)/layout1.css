@@ -872,4 +872,12 @@ nav {
     strong {
         text-decoration: underline;
     }
+
+    .row {
+        display: flex;
+
+        .col {
+            flex: 1;
+        }
+    }
 }
