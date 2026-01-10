@@ -368,7 +368,7 @@
     "country": "USA",
     "price": 13.8,
     "location": "Anime Weekend Atlanta",
-    "name": "Beef hotdog with tater tots",
+    "name": "Beef hotdog with tater tots"
   },
   {
     "id": "30",
@@ -440,7 +440,7 @@
     "country": "USA",
     "price": 4.1,
     "location": "Dairy Queen",
-    "name": "Small chocolate-dipped strawberry Blizzard",
+    "name": "Small chocolate-dipped strawberry Blizzard"
   },
   {
     "id": "36",
@@ -490,7 +490,7 @@
     "country": "USA",
     "price": 7.4,
     "location": "Ho Ho Chinese Restaurant",
-    "name": "American Chinese fast food",
+    "name": "American Chinese fast food"
   },
   {
     "id": "40",
