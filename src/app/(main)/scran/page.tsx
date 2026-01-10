@@ -131,7 +131,7 @@ export default function Messages() {
             if (!isRandom) {
               setCurrentGame((currentGame + 1) % scranGames.length)
               localStorage.setItem("last-completed", currentGame.toString())
-              let newHistory: ScranHistory = {
+              const newHistory: ScranHistory = {
                 [currentGame.toString()]: scores.map(s => !!s), // To make TS happy; should already all be bools atp
                 ...gameHistory, // Always keep the first scores for each round
               }
