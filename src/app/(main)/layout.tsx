@@ -22,7 +22,7 @@ const scranSubheaderFont = M_PLUS_Rounded_1c({
 
 export const metadata: Metadata = {
   title: "Happy Birthday Eimi!",
-  description: "Eimi Isami Industries Birthday Celebration Chat",
+  description: "Eimi Isami Birthday Celebration Page",
 };
 
 export default function Layout1({
