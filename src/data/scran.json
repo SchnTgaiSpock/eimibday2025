@@ -69,7 +69,7 @@
     "country": "CAN",
     "price": 6.1,
     "location": "Local shawarma place",
-    "name": "Chicken Shawarma",
+    "name": "Chicken shawarma",
     "description": "With a can of pop",
     "backgroundPosition": "left 30% top 60%"
   },
@@ -170,7 +170,7 @@
     "price": 10.8,
     "location": "Anime Weekend Atlanta",
     "name": "Konbini smashburger",
-    "backgroundPosition": "left 40% center"
+    "backgroundPosition": "left 20% center"
   },
   {
     "id": "14",
@@ -181,7 +181,7 @@
     "country": "USA",
     "price": 11.5,
     "location": "Oriental Buffet",
-    "name": "Chinese Take out sampler box",
+    "name": "Chinese take out sampler box",
     "description": "£6.30 per lb, mix of classic dishes",
     "backgroundPosition": "top 40% center"
   },
@@ -357,7 +357,7 @@
     "location": "QuikTrip",
     "name": "Pepperoni pizza and apple slices",
     "description": "Price includes Diet Coke",
-    "backgroundPosition": "left 30% bottom 30%"
+    "backgroundPosition": "left 20% bottom 30%"
   },
   {
     "id": "29",
@@ -417,7 +417,7 @@
     "location": "A&W",
     "name": "Hot dog and fried mix",
     "description": "Includes chicken, parmesan sticks and curly fries",
-    "backgroundPosition": "bottom center"
+    "backgroundPosition": "bottom right 30%"
   },
   {
     "id": "34",
@@ -541,7 +541,7 @@
     "location": "Joe & Sal's Pizza",
     "name": "Spicy pepperoni sicilian pizza",
     "description": "Two slices",
-    "backgroundPosition": "right 40% center"
+    "backgroundPosition": "right 30% center"
   },
   {
     "id": "44",
@@ -685,7 +685,7 @@
     "country": "USA",
     "price": 7.8,
     "location": "Bar on the side of the road",
-    "name": "3 Deep Fried Hot Dogs",
+    "name": "Three deep-fried hot dogs",
     "description": "Side of check engine light",
     "backgroundPosition": "top 20% right 40%"
   },
@@ -713,7 +713,7 @@
     "location": "Local BBQ joint",
     "name": "Pulled pork sandwich combo",
     "description": "With potato salad and cornbread",
-    "backgroundPosition": "bottom 30% center"
+    "backgroundPosition": "left 40% bottom 30%"
   },
   {
     "id": "58",
