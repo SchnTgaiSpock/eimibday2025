@@ -140,7 +140,7 @@ nav {
     background: linear-gradient(95deg, white 40%, #e5f0f8 59.7%, #819a00 60%, #9fc20a 65%, #c5f617 100%);
     color: var(--theme-text-light);
     min-width: 14rem;
-    z-index: 1;
+    z-index: 2;
     box-shadow: -6px 2px 8px 8px #21390070;
     view-transition-name: sidebar;
 
@@ -267,6 +267,49 @@ nav {
     overflow: scroll;
     scrollbar-width: thin;
     scroll-behavior: smooth;
+
+    .button-shadow {
+        filter: drop-shadow(2px 2px 3px #212930a0);
+        position: fixed;
+        z-index: 1;
+        bottom: 8px;
+
+        .message-nav-button {
+            background: var(--theme-secondary);
+            color: white;
+            width: 50px;
+            cursor: pointer;
+        }
+
+        &.prev {
+            left: calc(224px - 1rem);
+            transition: left 0.08s ease-in-out;
+
+            .message-nav-button {
+                padding-left: 1.5rem;
+                clip-path: polygon(80% 0, 100% 50%, 80% 100%, 0 100%, 0 0);
+            }
+
+            &:hover {
+                left: calc(224px);
+            }
+        }
+
+        &.next {
+            right: -1rem;
+            transition: right 0.08s ease-in-out;
+
+            .message-nav-button {
+                clip-path: polygon(20% 0, 0% 50%, 20% 100%, 100% 100%, 100% 0);
+                text-align: right;
+                padding-right: 1.5rem;
+            }
+
+            &:hover {
+                right: 0
+            }
+        }
+    }
 }
 
 .announcements {
