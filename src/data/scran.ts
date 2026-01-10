@@ -83,7 +83,7 @@ export const scrans: Scran[] = scranJson as Scran[]
 
 // Each game consists of 10 matches between 2 scrans
 export type ScranGame = [number, number][]
-export const scranGames: ScranGam[] = scranGameJson as ScranGame[]
+export const scranGames: ScranGame[] = scranGameJson as ScranGame[]
 
 const scranFeedback = [
     ["The Secretive, Hidden Scranner"],
