@@ -18,7 +18,7 @@ export interface Scran {
     percent: number
 }
 
-export type Score = boolean | null
+export type Score = boolean | null | 'r' | 'l' // r/l for ties to show which you picked
 
 export function getSubmittedBy(scran: Scran) {
     return scran.submittedBy ?? "Anonymous"

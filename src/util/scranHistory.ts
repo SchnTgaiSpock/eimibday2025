@@ -1,4 +1,6 @@
-export type ScranHistory = Record<string, boolean[] | undefined>
+import { Score } from "@/data/scran"
+
+export type ScranHistory = Record<string, Score[] | undefined>
 
 export function getHistoryFromStorage() {
     const historyStr = localStorage.getItem("round-history")

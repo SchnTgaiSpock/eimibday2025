@@ -1,19 +1,19 @@
 import { forwardRef } from "react"
-import { getCountry, getCountryFlagSpaces, getCountryFlagClass, getDescription, getLocation, getName, getPrice, getPercent, getSubmittedBy, getYear, Scran } from "../../../data/scran"
+import { getCountry, getCountryFlagSpaces, getCountryFlagClass, getDescription, getLocation, getName, getPrice, getPercent, getSubmittedBy, getYear, Scran, Score } from "../../../data/scran"
 import "flag-icons/css/flag-icons.min.css";
 
 interface ScranDisplayProps {
     scran: Scran
     side: 'left' | 'right'
-    isWinner: boolean,
+    outcome: Exclude<Score, null>,
     showPercent?: boolean
-    onClick: (isWinner: boolean) => void
+    onClick: (outcome: Exclude<Score, null>) => void
 }
 
 export function ScranDisplay({
     scran,
     side,
-    isWinner,
+    outcome,
     showPercent = false,
     onClick
 }: ScranDisplayProps) {
@@ -25,10 +25,10 @@ export function ScranDisplay({
             backgroundRepeat: "no-repeat",
             backgroundPosition: scran.backgroundPosition ?? 'center',
         }}
-        onClick={() => onClick(isWinner)}
+        onClick={() => onClick(outcome)}
     >
         <div className="scran-percent" style={{
-            ...(showPercent ? {color: isWinner ? "green" : "red"} : {color: "white"}),
+            ...(showPercent ? {color: outcome ? "green" : "red"} : {color: "white"}),
             fontSize: showPercent ? "2.5rem" : "8rem",
             opacity: showPercent ? 1 : 0
         }}>

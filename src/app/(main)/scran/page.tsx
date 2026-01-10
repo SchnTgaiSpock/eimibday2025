@@ -116,10 +116,10 @@ export default function Messages() {
     const scranLeft = scrans[scranMatches[round][0]];
     const scranRight = scrans[scranMatches[round][1]];
 
-    const onClick = (isWinner: boolean) => {
+    const onClick = (outcome: Exclude<Score, null>) => {
       if (animationStage !== 'shown' || currentGame === undefined) return;
       setScores(scores => {
-        scores[round] = isWinner;
+        scores[round] = outcome;
         return scores.slice();
       });
       setAnimationStage('percent')
@@ -133,7 +133,7 @@ export default function Messages() {
               setCurrentGame((currentGame + 1) % scranGames.length)
               localStorage.setItem("last-completed", currentGame.toString())
               const newHistory: ScranHistory = {
-                [currentGame.toString()]: scores.map(s => !!s), // To make TS happy; should already all be bools atp
+                [currentGame.toString()]: scores,
                 ...gameHistory, // Always keep the first scores for each round
               }
               localStorage.setItem("round-history", JSON.stringify(newHistory))
@@ -162,14 +162,14 @@ export default function Messages() {
         <ScranDisplay
           scran={scranLeft}
           side="left"
-          isWinner={getPercent(scranLeft) >= getPercent(scranRight)}
+          outcome={(getPercent(scranLeft) > getPercent(scranRight)) || (getPercent(scranLeft) === getPercent(scranRight) && 'l')}
           showPercent={animationStage !== 'shown'}
           onClick={onClick}
         />
         <ScranDisplay
           scran={scranRight}
           side="right"
-          isWinner={getPercent(scranRight) >= getPercent(scranLeft)}
+          outcome={(getPercent(scranLeft) < getPercent(scranRight)) || (getPercent(scranLeft) === getPercent(scranRight) && 'r')}
           showPercent={animationStage !== 'shown'}
           onClick={onClick}
         />
@@ -216,9 +216,8 @@ export default function Messages() {
               <p className="scran-review-name">{getName(left)}</p>
               <p className="scran-review-country-price">{getCountry(left)} • {getPrice(left)}</p>
               <p className="scran-review-country-price">Submitted by {getSubmittedBy(left)}</p>
-              {/* TODO: this logic does not work in the event of a tie */}
               <p className={`scran-review-percent ${getPercent(left) >= getPercent(right) ? "green" : "red"}`}>{getPercent(left)}%</p>
-              {getPercent(left) > getPercent(right) === !!scores[selectedReview] && <p className="scran-review-subtitle">YOU PICKED THIS</p>}
+              {(scores[selectedReview] === 'l' || getPercent(left) > getPercent(right) === !!scores[selectedReview]) && <p className="scran-review-subtitle">YOU PICKED THIS</p>}
             </div>
           </div>
           <div className="scran-review-side">
@@ -227,9 +226,8 @@ export default function Messages() {
               <p className="scran-review-name">{getName(right)}</p>
               <p className="scran-review-country-price">{getCountry(right)} • {getPrice(right)}</p>
               <p className="scran-review-country-price">Submitted by {getSubmittedBy(right)}</p>
-              <p className={`scran-review-percent ${getPercent(right) > getPercent(left) ? "green" : "red"}`}>{getPercent(right)}%</p>
-              {/* TODO: this logic does not work in the event of a tie */}
-              {getPercent(right) > getPercent(left) === !!scores[selectedReview] && <p className="scran-review-subtitle">YOU PICKED THIS</p>}
+              <p className={`scran-review-percent ${getPercent(left) <= getPercent(right) ? "green" : "red"}`}>{getPercent(right)}%</p>
+              {(scores[selectedReview] === 'r' || getPercent(left) < getPercent(right) === !!scores[selectedReview]) && <p className="scran-review-subtitle">YOU PICKED THIS</p>}
             </div>
           </div>
         </div>
