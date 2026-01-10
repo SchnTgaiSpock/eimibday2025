@@ -1,6 +1,7 @@
 "use client"
 
 import { messages } from "@/data/messages"
+import { scrans } from "@/data/scran"
 import { Fragment } from "react"
 
 export default function Credits() {
@@ -37,7 +38,7 @@ export default function Credits() {
               Liquid Skelie
             </p>
             <p>
-              <strong>Participants</strong>
+              <strong>Messages</strong>
             </p>
             <p>
               {messages.map((m, i) => <Fragment key={m.id}>
@@ -45,7 +46,20 @@ export default function Credits() {
                 {i !== messages.length - 1 && <br />}
               </Fragment>)}
             </p>
-            <p>(will be updated with scran participants once voting is complete)</p>
+            <p>
+              <strong>Scrans</strong>
+            </p>
+            <p>
+              {
+                (
+                  Array.from(
+                    new Set(scrans.filter(scran => scran.submittedBy != null).map(scran => scran.submittedBy))
+                  ).sort(function (a, b) {return a.toLowerCase().localeCompare(b.toLowerCase())})
+                ).map((m, i) => <Fragment key={i}>
+                {m !== '' && m}
+                {i !== messages.length - 1 && <br />}
+              </Fragment>)}
+            </p>
           </div>
         </div>
       </div>
