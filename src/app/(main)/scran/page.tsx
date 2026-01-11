@@ -52,7 +52,7 @@ export default function Messages() {
           <button className="scran-menu-play bottom grey" onClick={() => {
             if (currentGame === undefined) return
             const randomMatches: ScranGame = new Array(10)
-            // Get 20 random scrans, excluding 0
+            // Get 20 random scrans
             const randomScrans = shuffle(new Array(scrans.length).fill(0).map((_, i) => i)).slice(0, Math.min(20, scrans.length))
             // Pair them up
             for (let i = 0; i < 10; i++) {
