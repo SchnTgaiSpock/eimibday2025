@@ -84,7 +84,7 @@ nav {
     display: flex;
     position: relative;
     align-items: center;
-    z-index: 3;
+    z-index: 103;
 
     .logo {
         margin: 1rem 1rem;
@@ -140,7 +140,7 @@ nav {
     background: linear-gradient(95deg, white 40%, #e5f0f8 59.7%, #819a00 60%, #9fc20a 65%, #c5f617 100%);
     color: var(--theme-text-light);
     min-width: 14rem;
-    z-index: 2;
+    z-index: 102;
     box-shadow: -6px 2px 8px 8px #21390070;
     view-transition-name: sidebar;
 
@@ -271,7 +271,7 @@ nav {
     .button-shadow {
         filter: drop-shadow(2px 2px 3px #212930a0);
         position: fixed;
-        z-index: 1;
+        z-index: 101;
         bottom: 8px;
 
         .message-nav-button {
@@ -335,6 +335,58 @@ nav {
     box-shadow: 5px 5px 7px 2px #BEBEBE;
     margin-top: 1rem;
     margin-bottom: 1rem;
+}
+
+@keyframes rot {
+    from {rotate: calc(sin(sibling-index()*1.7)*6deg);}
+    40% {rotate: calc(sin(sibling-index()*1.7)*6deg);}
+    80% {rotate: calc(sin(sibling-index()*10.7)*6deg);}
+    to {rotate: calc(sin(sibling-index()*10.7)*6deg);}
+}
+
+@keyframes shift {
+    from {translate: 0%;}
+    20% {translate: 0%;}
+    60% {translate: 30%;}
+    70% {translate: 30%;}
+    90% {translate: 0%;}
+    to {translate: 0%;}
+}
+
+@keyframes bounce {from {top:0;transform:scale(1,1);} to{top:4rem;transform:scale(1.3,0.5);}}
+
+.paper-wrapper:has(~ .setting-sticky #scroll-anim:checked) {
+    z-index: calc(100 - sibling-index()); /* leftmost on top */
+    transform: none !important;
+    animation-name: shift;
+    animation-timing-function: ease;
+    animation-timeline: view(x);
+}
+.paper-wrapper:has(~ .setting-sticky #scroll-anim:checked):not(:has(~ .setting-sticky #disable-rot:checked)) {
+    animation-name: rot, shift;
+    animation-timing-function: cubic-bezier(0, 0.8, 1, 0.2), ease;
+    animation-timeline: view(x), view(x);
+}
+
+.setting-sticky {
+    --size: calc((100vh - 10rem)*0.25);
+    width: var(--size);
+    height: var(--size);
+    padding: 10px;
+    position: fixed;
+    bottom: 2rem;
+    left: 2rem;
+    background-color: pink;
+    rotate: -10deg;
+    z-index: 105;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    box-shadow: 5px 5px 7px 2px rgba(0,0,0,0.2);
+
+    label {
+        display: flex;
+    }
 }
 
 .paper {

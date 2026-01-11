@@ -48,6 +48,12 @@ export default function Messages() {
       >
         <div className="message-nav-button">Next</div>
       </div>
+      <div className="setting-sticky">
+        <label htmlFor="scroll-anim">
+           <input type="checkbox" id="scroll-anim" />scroll animation<br />(not on firefox)</label>
+        <label htmlFor="disable-rot">
+           <input type="checkbox" id="disable-rot" />disable rotation</label>
+      </div>
     </div>
   );
 }
