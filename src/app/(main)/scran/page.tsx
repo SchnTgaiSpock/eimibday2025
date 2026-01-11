@@ -53,7 +53,7 @@ export default function Messages() {
             if (currentGame === undefined) return
             const randomMatches: ScranGame = new Array(10)
             // Get 20 random scrans, excluding 0
-            const randomScrans = shuffle(new Array(scrans.length-1).fill(0).map((_, i) => i+1)).slice(0, Math.min(20, scrans.length))
+            const randomScrans = shuffle(new Array(scrans.length).fill(0).map((_, i) => i)).slice(0, Math.min(20, scrans.length))
             // Pair them up
             for (let i = 0; i < 10; i++) {
               randomMatches[i] = [randomScrans[i % randomScrans.length], randomScrans[(i + 10) % randomScrans.length]]
