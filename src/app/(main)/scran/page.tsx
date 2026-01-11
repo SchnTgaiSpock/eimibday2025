@@ -236,6 +236,7 @@ export default function Messages() {
       <div className="scran-results-footer">
         <button className="scran-menu-box blue" onClick={() => {
           setStage("menu")
+          setSelectedReview(undefined)
         }}>Done</button>
       </div>
     </div>
