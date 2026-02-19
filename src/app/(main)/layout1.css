@@ -177,6 +177,14 @@ nav {
         &:nth-of-type(4) .sidebar-link {
             left: -90px;
             padding-left: 105px;
+            color: var(--theme-text-dark);
+            background-color: var(--theme-pink);
+            clip-path: polygon(90% 0, 100% 50%, 90% 100%, 0 100%, 0 0);
+        }
+
+	&:nth-of-type(5) .sidebar-link {
+            left: -95px;
+            padding-left: 110px;
             background-color: var(--theme-primary);
             clip-path: polygon(90% 0, 100% 50%, 90% 100%, 0 100%, 0 0);
         }
