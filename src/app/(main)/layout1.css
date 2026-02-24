@@ -886,6 +886,116 @@ nav {
     }
 }
 
+.eimisweeper {
+    font-size: 1.4rem;
+    width: 100%;
+    height: calc(100vh - 122px);
+    overflow-y: scroll;
+
+    .eimisweeper-game, .eimisweeper-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .generator-settings :invalid {
+    }
+
+    .grid {
+        --space-between-cells: 4px;
+        /* not currently used; can use with grid-template-columns/rows,
+         * or explicit width+height on cells */
+        --cell-sidelen: 40px;
+        /* This is the main factor that changes grid size currently.
+         * 3ch is enough padding while also fitting a decent number of cells */
+        --img-size: 3ch;
+        padding: var(--space-between-cells);
+        background-color:#cccccc;
+        display: grid;
+        width: fit-content;
+        height: fit-content;
+        /*grid-template-columns: repeat(var(--cols), 1fr);
+        grid-template-rows: repeat(var(--rows), 1fr);*/
+        grid-auto-columns: 1fr;
+        grid-auto-rows: 1fr;
+        gap: var(--space-between-cells);
+        font-family: "Courier New";
+        font-weight: bold;
+
+        .cell {
+            user-select: none;
+            grid-row-start: calc(1 + var(--y));
+            grid-row-end: calc(2 + var(--y));
+            grid-column-start: calc(1 + var(--x));
+            grid-column-end: calc(2 + var(--x));
+            aspect-ratio: 1;
+            min-width:20px;
+            /*width: calc(var(--sidelen));*/
+            /*height: calc(var(--sidelen));*/
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: clip;
+            background-color: #dddddd;
+            position: relative;
+
+            div {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                img {
+                    max-width: var(--img-size);
+                    max-height: var(--img-size);
+                }
+            }
+        }
+        .cell.hidden {
+            background-color: #888888;
+        }
+        .cell.hidden:hover {
+            background-color: #aaaaaa;
+        }
+        .cell.hidden.adjhover {
+            background-color: #9999aa;
+        }
+
+        .cell.hidden.flagged {
+            background-color: #cc8888;
+        }
+        .cell.hidden.flagged:after {
+            content: "🚩";
+            position: absolute;
+            padding-left: 0.2em; /* flag is left-heavy */
+        }
+        .cell.hidden.flagged:hover {
+            background-color: #cc8888;
+        }
+        .cell.hidden.flagged.adjhover {
+            background-color: #dd9999;
+        }
+        .cell.hidden > div {
+            opacity: 0;
+        }
+    }
+    .grid.hex {
+        /*grid-template-columns: repeat(var(--cols), 1fr);
+        grid-template-rows: repeat(var(--rows), 1fr);*/
+        grid-auto-columns: 1fr 1fr;
+        grid-auto-rows: 1fr 2fr;
+        gap: calc(var(--space-between-cells) * sqrt(3)) var(--space-between-cells);
+
+        .cell {
+            grid-row-start: calc(1 + var(--y)*2);
+            grid-row-end: calc(4 + var(--y)*2);
+            grid-column-start: calc(1 + var(--x)*2 + mod(var(--y),2));
+            grid-column-end: calc(3 + var(--x)*2 + mod(var(--y),2));
+            aspect-ratio: calc(sqrt(3)/2);
+            clip-path: polygon(50% 0%, 0% 25%, 0% 75%, 50% 100%, 100% 75%, 100% 25%);
+        }
+    }
+}
+
 .credits {
     strong {
         text-decoration: underline;

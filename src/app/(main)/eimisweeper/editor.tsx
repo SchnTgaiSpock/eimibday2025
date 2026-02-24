@@ -1,0 +1,220 @@
+"use client"
+
+import { Pos, Cell, BoardGeometry, BoardInfo, EimisweeperGame, serializeBoard, recreateBoard, range } from "@/data/eimisweeper";
+
+
+/// ----------------- Editor functionality, updating size or arrangement of the grid
+function shiftCol(col, shift, setBoard) {
+  const update = board => recreateBoard({
+    ...board,
+    cells: board.cells.map(
+      cell => cell.pos.x===col?{...cell, pos:{y:(cell.pos.y+shift)%board.info.y, x:col}}:cell),
+  })
+  setBoard(update)
+}
+function shiftRow(row, shift, setBoard) {
+  const update = board => recreateBoard({
+    ...board,
+    cells: board.cells.map(
+      cell => cell.pos.y===row?{...cell, pos:{y:row, x:(cell.pos.x+shift)%board.info.x}}:cell),
+  })
+  setBoard(update)
+}
+function removeCol(col, setBoard) {
+  const update = board => recreateBoard({
+    ...board,
+    cells: board.cells.filter(cell => cell.pos.x!==col)
+      .map(cell => cell.pos.x > col?{...cell, pos:{x: cell.pos.x-1, y: cell.pos.y}}:cell),
+    info: {...board.info, x: board.info.x-1},
+  })
+  setBoard(update)
+}
+function removeRow(row, setBoard) {
+  const update = board => recreateBoard({
+    ...board,
+    cells: board.cells.filter(cell => cell.pos.y!==row)
+      .map(cell => cell.pos.y > row?{...cell, pos:{x: cell.pos.x, y: cell.pos.y-1}}:cell),
+    info: {...board.info, y: board.info.y-1},
+  })
+  setBoard(update)
+}
+function addCol(beforeCol, setBoard) {
+  const update = board => recreateBoard({
+    ...board,
+    cells: [
+      ...cells.map((cell) => cell.pos.x < beforeCol?cell:{...cell, pos:{x:cell.pos.x+1, y:cell.pos.y}}),
+      ...range(board.info.y).map(y=>({
+        pos:{x: beforeCol, y:y},
+        adj: [], content: '', isBomb: false, isOpen: false, hidden: false, flagged: false
+      }))
+    ],
+    info: {...board.info, x: board.info.x+1},
+  })
+  setBoard(update)
+}
+function addRow(beforeRow: number, setBoard) {
+  const update = board => recreateBoard({
+    ...board,
+    cells: [
+      ...cells.map((cell) => cell.pos.y < beforeRow?cell:{...cell, pos:{x:cell.pos.x, y:cell.pos.y+1}}),
+      ...range(board.info.x).map(x=>({
+        pos:{x: x, y: beforeRow},
+        adj: [], content: '', isBomb: false, isOpen: false, hidden: false, flagged: false
+      }))
+    ],
+    info: {...board.info, y: board.info.y+1},
+  })
+  setBoard(update)
+}
+/// Editor: Fill board with all possible cells (no content).
+function addAllEmptyCells(setBoard) {
+  const update = board => recreateBoard({
+    ...board,
+    cells: [...cells,
+      ...range(board.info.x).map(x=>range(board.info.y).map(y=>({x:x,y:y})))
+      .flat().filter(p=>!(p.y in board.index)||!(p.x in board.index[p.y]))
+      .map(p=>({
+        pos: p,
+        adj: undefined, // will be updated by recreateBoard()
+        content: '',
+        isBomb: false,
+        isOpen: false,
+        hidden: false,
+        flagged: false,
+      })),
+    ],
+  })
+  setBoard(update)
+}
+/// Editor: auto-populate content for numeric/empty cells
+function updateContent(board: LiveBoard): LiveBoard {
+  let cells = board.cells.map(cell => {
+    const bombCount = cell.adj.filter(i=>board.cells[i].isBomb).length;
+    const newContent = cell.isBomb? '*' :
+      'number'===typeof cell.content? bombcount :
+      cell.content;
+    return (content===newContent)? cell : {
+      ...cell,
+      content: newContent,
+      isOpen: newContent===0,
+    }
+  });
+  return {
+    ...board,
+    cells: cells,
+  };
+}
+
+interface EditorColProps {
+  col: number
+  lastrow: number
+  setBoard: (updater: (board: LiveBoard)=>LiveBoard)=>void
+}
+interface EditorRowProps {
+  row: number
+  lastcol: number
+  setBoard: (updater: (board: LiveBoard)=>LiveBoard)=>void
+}
+
+function EditorInsertColButton({col, lastrow, setBoard}: EditorColProps) {
+  return <button className="editor-insert col" style={{"--x": col, "--y": lastrow}} onClick={()=>addCol(col, setBoard)}>{"+"}</button>
+}
+function EditorInsertRowButton({row, lastcol, setBoard}: EditorRowProps) {
+  return <button className="editor-insert row" style={{"--y": row, "--x": lastcol}} onClick={()=>addRow(row, setBoard)}>{"+"}</button>
+}
+function EditorEditColButtons({col, lastrow, setBoard}: EditorColProps) {
+  return <div classname="editor-edit col" style={{"--x": col}}>
+  <button classname="shift-back" onClick={()=>shiftColumn(col, -1, setBoard)}/>
+  <button classname="remove" onClick={()=>removeCol(col, setBoard)}/>
+  <button classname="shift-forward" onclick={()=>shiftColumn(col, 1, setBoard)}/>
+  </div>
+}
+function EditorEditRowButtons({row, lastcol, setBoard}: EditorRowProps) {
+  return <div classname="editor-edit row" style={{"--y": row}}>
+  <button classname="shift-back" onClick={()=>shiftRow(row, -1, setBoard)}/>
+  <button classname="remove" onClick={()=>removeRow(row, setBoard)}/>
+  <button classname="shift-forward" onclick={()=>shiftRow(row, 1, setBoard)}/>
+  </div>
+}
+// All the editor buttons to add/remove/etc rows and columns of the grid.
+// These buttons are displayed as part of the grid (on the edges)
+export function EditorButtons(x: number, y: number, setBoard) {
+  return <>
+    {range(x+1).map((xcoord) => <EditorInsertColButton col={xcoord+1} lastrow={y} setBoard={setBoard} />)}
+    {range(y+1).map((ycoord) => <EditorInsertRowButton row={ycoord+1} lastcol={x} setBoard={setBoard} />)}
+    {range(x).map((xcoord) => <EditorEditColButtons col={xcoord+1} lastrow={y} setBoard={setBoard} />)}
+    {range(y).map((ycoord) => <EditorEditRowButtons row={ycoord+1} lastcol={x} setBoard={setBoard} />)}
+  </>
+}
+
+// ----------------------------------------------------- Event handlers for Editor
+const gridOnKeydownEditor = setBoard => (e) => {
+  const i = cellIndexFromEvent(e);
+  if (i===undefined) return;
+  if (/[a-zA-Z0-9? ]/.test(e.key)) { // TODO backspace/del to remove/disable?
+    // set content
+    // TODO update Q/Mines total info based on diff, or disallow
+    setBoard(board => ({
+      ...board,
+      cells: board.cells.map((cell, j)=> {
+        if (j===i) {
+          let content = e.key;
+          if (/[0-9]/.test(e.key)) {
+            content = +(e.key);
+          }
+          return {...cell, content: content, isOpen: content===0};
+        }
+        return cell;
+      })
+      //TODO info: {...board.info, ...}
+    }));
+  }
+}
+
+const gridOnClickEditor = setBoard => (e) => {
+  const i = cellIndexFromEvent(e);
+  if (i===undefined) return;
+  // toggle hidden
+  setBoard(board => ({
+    ...board,
+    cells: board.cells.map((cell,j)=>
+      j===i?{...cell, hidden: !cell.hidden}: cell)
+  }));
+}
+
+const gridOnContextmenuEditor = setBoard => (e)=>{
+  if (!e.shiftKey) {
+    e.preventDefault();
+    const i = cellIndexFromEvent(e);
+    if (i===undefined) return;
+    // (editor mode) toggle Bomb
+    // also updates surrounding cells
+    setBoard(board => {
+      let diff = board.cells[i].isBomb ? -1 : 1;  // are we removing a bomb or adding it?
+      const cells = board.cells.map((cell,j) => {
+        if (j!==i) {
+          if (cell.adj.includes(i) && 'number'===typeof cell.content) {
+            return {...cell, content: cell.content+diff, isOpen: cell.content+diff <= 0};
+          }
+          return cell;
+        }
+        let nowBomb = !cell.isBomb;
+        const bombCount = cell.adj.filter(i=>board.cells[i].isBomb).length;
+        return {
+          ...cell,
+          isBomb: nowBomb,
+          isOpen: !nowBomb && bombcount===0,
+          content: nowBomb? '*' : bombcount,
+        };
+      });
+      return {
+        ...board,
+        cells: cells,
+        info: {...board.info, totalMines: board.info.totalMines+diff},
+      };
+    });
+  }
+}
+// ----------------------------------------------------- Event handlers for Editor
+
+

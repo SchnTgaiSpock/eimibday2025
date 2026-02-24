@@ -1,0 +1,116 @@
+[
+	{
+		"author": "Vasher",
+		"title": "Euphoria Hunt",
+		"date": "2026-02-10",
+		"display": {
+			"H": "HinaHug",
+			"M": "MuyuCool",
+			"R": "RunieHeart",
+			"S": "SayaLove"
+		},
+		"info": {
+			"x": 10,
+			"y": 8,
+			"totalMines": 32,
+			"showTotalMines": true,
+			"noGuessing": true
+		},
+		"data": {
+			"content":"01**2101**\n1224*433H*\n*102****5*\n12122334**\nM1*10013**\n1232112*5*\n2*4*44*5S*\n*R********",
+			"visible":"VHHHHHHHHH\nHHHHHHHHHH\nHHHHHHHHHH\nHHHHHHHHHH\nHHHHHHHHHH\nHHHHHHHHHH\nHHHHHHHHHH\nHHHHHHHHHH"
+		}
+	},
+	{
+		"author": "Vasher",
+		"title": "Rows",
+		"date": "2026-02-09",
+		"display": {
+			"?": "EimiChu"
+		},
+		"info": {
+			"x": 9,
+			"y": 9,
+			"totalMines": 24,
+			"showTotalMines": true,
+			"noGuessing": true
+		},
+		"data": {
+			"content": "01*11*100\n233221222\n**4*322**\n**4**2*3?\n233333332\n13*21*3**\n1**212*4*\n233322232\n*11**11*1",
+			"visible": "HHHHHHHHH\nVVVVVVVVV\nHHHHHHHHH\nHHHHHHHHH\nVVVVVVVVV\nHHHHHHHHH\nHHHHHHHHH\nVVVVVVVVV\nHHHHHHHHH"
+		}
+	},
+	{
+		"author": "Vasher",
+		"title": "puzzle 3",
+		"date": "2026-02-08",
+		"info": {
+			"x": 9,
+			"y": 3,
+			"totalMines": 10,
+			"showTotalMines": false,
+			"noGuessing": true
+		},
+		"data": {
+			"content": "1**11***1\n134334642\n01**2***1",
+			"visible": "HHHHHHHHH\nVHVHVHVHV\nHHHHHHHHH"
+		}
+	},
+	{
+		"author": "Vasher",
+		"title": "Snowflake",
+		"date": "2026-02-07",
+		"display": {
+			"?": "EimiChu"
+		},
+		"info": {
+			"x": 7,
+			"y": 7,
+			"totalMines": 13,
+			"showTotalMines": false,
+			"noGuessing": true
+		},
+		"data": {
+			"content": "1*2?2*1\n?2*?*2?\n1?242?1\n*2*3*2*\n1?3*3?1\n?2*3*2?\n1*2?2*1",
+			"visible": "VHHHHHV\nHVHHHVH\nHHVHVHH\nHVHVHVH\nVHVHVHV\nHVHVHVH\nVHVHVHV"
+		}
+	},
+	{
+		"author": "Vasher",
+		"title": "puzzle 2",
+		"date": "2026-02-06",
+		"display": {
+			"?": "EimiChu"
+		},
+		"info": {
+			"x": 9,
+			"y": 7,
+			"totalMines": 16,
+			"showTotalMines": false,
+			"noGuessing": true
+		},
+		"data": {
+			"content": "*2*10?**\n?312123?\n*22?*22*\n13**3*3?\n?2*3?12*\n2322112?\n**11*?1*",
+			"visible": "HHHHHHHH\nHVVVVVVH\nHVHHHHVH\nHVHHHHVH\nHVHHHHVH\nHVVVVVVH\nHHHHHHHH"
+		}
+	},
+	{
+		"author": "Vasher",
+		"title": "puzzle 1",
+		"date": "2026-01-30",
+		"display": {
+			"W": "EimiWota"
+		},
+		"info": {
+			"x": 8,
+			"y": 8,
+			"totalMines": 16,
+			"showTotalMines": false,
+			"noGuessing": true
+		},
+		"data": {
+			"content": "02***311\n13*5*3*2\n*313354*\n*433***2\n3***7*41\n3*6***20\n2*434321\n112*11*W",
+			"visible": "VHHHHHHH\nHHHHHHHH\nHHHHHHHH\nHHHHHHHH\nHHHHHHHH\nHHHHHHHH\nHHHVVHHH\nHHHHHHHH"
+		}
+	}
+]
