@@ -892,6 +892,25 @@ nav {
     height: calc(100vh - 122px);
     overflow-y: scroll;
 
+    .game-chooser {
+        table.puzzles {
+            tr {
+                background-color:#ccc;
+            }
+            tr:nth-child(2n) {
+                background-color:#ddd;
+            }
+            tbody {
+                tr {
+                    cursor: pointer;
+                }
+                tr:hover {
+                    opacity: 0.8;
+                }
+            }
+        }
+    }
+
     .eimisweeper-game, .eimisweeper-header {
         display: flex;
         flex-direction: column;

@@ -155,17 +155,34 @@ function GeneratorSettings({disabled}) {
   </div>
 }
 
-function RenderGame({ game }: EimisweeperGame) {
+function RenderGame({ game, setGame }: EimisweeperGame) {
   const [board, setBoard] = useState<LiveBoard>(game.board);
+  const [generated, setGenerated] = useState<boolean>(game.generated);
   const [hoverIdx, setHover] = useState<number | null>(null);
   const [editorMode, setEditorMode] = useState<boolean>(false);
   "TODO: pre-start only for random games";
-  const [gameStage, setGameStage] = useState<'generating' | 'playing' | 'win' | 'lose'>('playing');
-  "Score: when winning, show time to beat; when losing show time + %cleared";
   //const setHoverLog = useCallback((x)=>{console.log("setting hover to",x); return setHover(x);}, [setHover]);
   //const setBoardWithUndo = updater => board => {addUndo(board); return updater(board)}
   //TODO useContext/useEffect for undo stack? research
   let globalsettings = {"chording": true};
+  // play info
+  const [gameStage, setGameStage] = useState<'generating' | 'playing' | 'win' | 'lose'>('playing');
+  "Score: when winning, show time to beat; when losing show time + %cleared";
+  let [mistakes, setMistakes] = useState(0);
+  let [startTime, setStartTime] = useState(null);
+  let [finishTime, setFinishTime] = useState(null);
+  // when gameStage is updated (to playing):
+  //  setStartTime(now)
+  //  start timer (interval to update currentTime / displayed time)
+  //  while playing: display as currentTime() - startTime (round to seconds)
+  // when gameStage is updated (to win/loss):
+  //  setFinishTime(now)
+  //  stop timer
+  //  display game end time as finishTime - startTime (rounded)
+  // when gameStage is updated (to playing/Continue):
+  //  setFinishTime(null)
+  //  restart timer (with same startTime)
+  // when gameStage is 'generating': set start/finish to null
 
   // ----------------------------------------------------- Event handlers for grid
   // Reveal cells on click
@@ -226,8 +243,12 @@ function RenderGame({ game }: EimisweeperGame) {
             </div> : ""}
         </div>
         <div className="game-controls">
-          <button name="reset">Reset</button>
-          <button name="exit-to-menu">Exit</button>
+          <button name="reset" onClick={()=>{
+            // how is the state working here? need to reset board state as well as game???
+            setBoard(game.board);
+            setGame(cur=>({...cur}));
+          }}>Reset</button>
+          <button name="exit-to-menu" onClick={()=>setGame(null)}>Exit to Menu</button>
         </div>
       </div>
       <div
@@ -274,17 +295,42 @@ export default function Eimisweeper() {
   //}, [])
   // Game state
   //const [stage, setStage] = useState<'menu' | 'round-select' | 'game' | 'results'>('menu')
-  //const [animationStage, setAnimationStage] = useState<'percent' | 'hidden' | 'shown'>('shown')
-  //const [feedback, setFeedback] = useState("")
 
   //{stage === 'menu' && renderMenu()}
   //{stage === 'random-settings' && renderBoardGenSettings()}
   //{stage === 'game' && renderGame()}
-  const [game, setGame] = useState(generatePuzzle(puzzles[1]))
+  const [game, setGame] = useState(null)
 
   return <div className="eimisweeper">
-    <RenderGame game={game} />
+    {game===null ?
+      <GameChooser setGame={setGame} /> :
+      <RenderGame game={game} setGame={setGame} />
+    }
   </div>
-  
+}
+
+function PuzzleInfo({puzzle, setGame}) {
+  return <tr className="puzzleInfo" onClick={()=>setGame(generatePuzzle(puzzle))}>
+  <td>{puzzle.title}</td>
+  <td>{"by " + puzzle.author}</td>
+  <td>{puzzle.date}</td>
+  <td>{puzzle.info.noGuessing ? "Yes" : "No"}</td>
+  </tr>
+}
+
+function GameChooser({setGame}) {
+  //const [sort, setSort] = useState(null);
+  //let puzzles = puzzles.asSorted(sort);
+  return <div className="game-chooser">
+    <table className="puzzles">
+      <caption>Premade Puzzles</caption>
+      <thead><tr className="puzzles-header">
+        <th>Title</th><th>Author</th><th>Date</th><th>Solvable without guessing</th>
+      </tr></thead>
+      <tbody>
+        {puzzles.map((p,i)=>(<PuzzleInfo puzzle={p} key={i} setGame={setGame} />))}
+      </tbody>
+    </table>
+  </div>
 }
 
