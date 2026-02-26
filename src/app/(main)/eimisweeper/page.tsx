@@ -245,7 +245,9 @@ function RenderGame({ game, setGame }: EimisweeperGame) {
         <div className="game-controls">
           <button name="reset" onClick={()=>{
             // how is the state working here? need to reset board state as well as game???
+            // TODO understand how this works
             setBoard(game.board);
+            setGameStage('playing');
             setGame(cur=>({...cur}));
           }}>Reset</button>
           <button name="exit-to-menu" onClick={()=>setGame(null)}>Exit to Menu</button>
