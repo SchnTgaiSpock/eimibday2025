@@ -60,17 +60,19 @@ function EimisweeperCell({
     adjHover,
     setHover
 }: EimsweeperCellProps) {
-    return <div
-      className={"cell"
-	      + (hidden  ?" hidden"  :"")
-	      + (flagged ?" flagged" :"")
-	      + (adjHover?" adjhover":"")}
-      style={{"--x": pos.x, "--y": pos.y}}
-      onPointerEnter={()=>setHover(idx)}
-      onPointerLeave={()=>setHover(null)}
-    >
-    <div>{content in sprites? sprites[content] && <img src={sprites[content]}/> : content==="*"?"💣":content}</div>
-    </div>
+  // default mine is EimiUeh
+  if (content==="*") content = "EimiUeh";
+  return <div
+    className={"cell"
+            + (hidden  ?" hidden"  :"")
+            + (flagged ?" flagged" :"")
+            + (adjHover?" adjhover":"")}
+    style={{"--x": pos.x, "--y": pos.y}}
+    onPointerEnter={()=>setHover(idx)}
+    onPointerLeave={()=>setHover(null)}
+  >
+  <div>{content in sprites? sprites[content] && <img src={sprites[content]}/> : content==="*"?"💣":content}</div>
+  </div>
 }
 
 // get cell index from propagated event.
