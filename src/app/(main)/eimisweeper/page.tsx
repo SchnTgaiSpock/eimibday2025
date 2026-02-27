@@ -234,8 +234,8 @@ function RenderGame({ game, setGame }: EimisweeperGame) {
           <div className="game-stage">{"Game stage is: "+gameStage}</div>
           <div className="unflagged-mines">
           {"Mines Left: " + (board.info.showTotalMines
-               ? board.info.totalMines - board.cells.filter(c=>c.flagged).length
-               : "??")}
+               ? board.info.totalMines - board.cells.filter(c=>c.flagged||(c.isBomb&&!c.hidden)).length
+               : "???")}
           </div>
           {board.info.showTotalQs ? <div className="found-qs">
             {"Found " + cells.filter(c=>!c.hidden && !('number'===typeof c.content)).length
@@ -244,11 +244,8 @@ function RenderGame({ game, setGame }: EimisweeperGame) {
         </div>
         <div className="game-controls">
           <button name="reset" onClick={()=>{
-            // how is the state working here? need to reset board state as well as game???
-            // TODO understand how this works
-            setBoard(game.board);
-            setGameStage('playing');
-            setGame(cur=>({...cur}));
+            // https://react.dev/learn/preserving-and-resetting-state
+            setGame({...game});
           }}>Reset</button>
           <button name="exit-to-menu" onClick={()=>setGame(null)}>Exit to Menu</button>
         </div>
@@ -302,11 +299,16 @@ export default function Eimisweeper() {
   //{stage === 'random-settings' && renderBoardGenSettings()}
   //{stage === 'game' && renderGame()}
   const [game, setGame] = useState(null)
+  const [key, setKey] = useState(0);
+  const newGame = g=> {
+    setKey(k=>k+1); // force game to re-render (reset state)
+    setGame(g);
+  }
 
   return <div className="eimisweeper">
     {game===null ?
       <GameChooser setGame={setGame} /> :
-      <RenderGame game={game} setGame={setGame} />
+      <RenderGame key={key} game={game} setGame={newGame} />
     }
   </div>
 }

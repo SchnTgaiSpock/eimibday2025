@@ -889,8 +889,11 @@ nav {
 .eimisweeper {
     font-size: 1.4rem;
     width: 100%;
-    height: calc(100vh - 122px);
+    height: calc(100vh - 122px); /* TODO better layout */
     overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
     .game-chooser {
         table.puzzles {
@@ -907,6 +910,11 @@ nav {
                 tr:hover {
                     opacity: 0.8;
                 }
+                td {
+                    text-align: center;
+                    padding-left: 1ch;
+                    padding-right: 1ch;
+                }
             }
         }
     }
@@ -918,6 +926,7 @@ nav {
     }
 
     .generator-settings :invalid {
+        background-color: #c99;
     }
 
     .grid {
@@ -944,9 +953,9 @@ nav {
         .cell {
             user-select: none;
             grid-row-start: calc(1 + var(--y));
-            grid-row-end: calc(2 + var(--y));
+            grid-row-end: span 1;
             grid-column-start: calc(1 + var(--x));
-            grid-column-end: calc(2 + var(--x));
+            grid-column-end: span 1;
             aspect-ratio: 1;
             min-width:20px;
             /*width: calc(var(--sidelen));*/
@@ -994,7 +1003,7 @@ nav {
             background-color: #dd9999;
         }
         .cell.hidden > div {
-            opacity: 0;
+            visibility: hidden;
         }
     }
     .grid.hex {
@@ -1006,9 +1015,9 @@ nav {
 
         .cell {
             grid-row-start: calc(1 + var(--y)*2);
-            grid-row-end: calc(4 + var(--y)*2);
+            grid-row-end: span 3;
             grid-column-start: calc(1 + var(--x)*2 + mod(var(--y),2));
-            grid-column-end: calc(3 + var(--x)*2 + mod(var(--y),2));
+            grid-column-end: span 2;
             aspect-ratio: calc(sqrt(3)/2);
             clip-path: polygon(50% 0%, 0% 25%, 0% 75%, 50% 100%, 100% 75%, 100% 25%);
         }
