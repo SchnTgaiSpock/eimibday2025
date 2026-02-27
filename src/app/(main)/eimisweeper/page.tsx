@@ -1,14 +1,14 @@
 "use client"
 
-import { Pos, Cell, BoardGeometry, BoardInfo, EimisweeperGame, puzzles, generatePuzzle, serializeBoard, recreateBoard, sprites, range } from "@/data/eimisweeper";
-import { EditorButtons } from "./editor"
-import { useEffect, useState, useCallback } from "react";
+import { Pos, Cell, BoardGeometry, BoardInfo, LiveBoard, EimisweeperGame, EimisweeperPuzzleData, puzzles, generatePuzzle, sprites } from "@/data/eimisweeper";
+import { EditorButtons, gridOnClickEditor, gridOnContextmenuEditor, gridOnKeydownEditor } from "./editor"
+import { useState, useCallback } from "react";
 
 /// Global game settings
 /// Flagging and Chording can be disabled
 type EimisweeperSettings = {
-  allowFlagging: boolean,
-  allowChording: boolean,
+  flagging: boolean,
+  chording: boolean,
 };
 
 const PresetBeginner: BoardInfo = {
@@ -42,12 +42,12 @@ const PresetExpert: BoardInfo = {
 
 interface EimisweeperCellProps {
     pos: Pos
-    key: number
-    content: string
+    idx: number
+    content: string | number
     hidden: boolean
     flagged: boolean
     adjHover: boolean
-    setHover: (number)=>void
+    setHover: (arg0: number | null)=>void
 }
 
 /// JSX Cell element
@@ -59,7 +59,7 @@ function EimisweeperCell({
     flagged,
     adjHover,
     setHover
-}: EimsweeperCellProps) {
+}: EimisweeperCellProps) {
   // default mine is EimiUeh
   if (content==="*") content = "EimiUeh";
   return <div
@@ -67,11 +67,11 @@ function EimisweeperCell({
             + (hidden  ?" hidden"  :"")
             + (flagged ?" flagged" :"")
             + (adjHover?" adjhover":"")}
-    style={{"--x": pos.x, "--y": pos.y}}
+    style={{"--x": pos.x, "--y": pos.y} as React.CSSProperties}
     onPointerEnter={()=>setHover(idx)}
     onPointerLeave={()=>setHover(null)}
   >
-  <div>{content in sprites? sprites[content] && <img src={sprites[content]} alt={content} /> : content==="*"?"💣":content}</div>
+  <div>{content in sprites? sprites[content] && <img src={sprites[content]} alt={content.toString()} /> : content==="*"?"💣":content}</div>
   </div>
 }
 
@@ -79,12 +79,12 @@ function EimisweeperCell({
 // Used for all events interacting with specific grid cells
 // requires that the element order matches up with cells array
 // (i.e. no other grid children before the cells)
-function cellIndexFromEvent(e) {
+export function cellIndexFromEvent(e: React.SyntheticEvent) {
   // currentTarget is the grid
   if (e.target !== e.currentTarget) {
-    let el = e.target;
+    let el = e.target as HTMLElement;
     while(el.parentElement !== e.currentTarget){
-      el = el.parentElement;
+      el = el.parentElement!;
     }
     return [...el.parentElement.children].indexOf(el);
   }
@@ -108,7 +108,7 @@ function floodfill(cells: Cell[], queue: number[]): number[] {
 }
 
 /// Update cell visibility (and possibly win/loss state) by revealing cells in `idxs`
-function reveal(cells: Cell[], setGameState: ((state: string)=>void), idxs: number[]): Cell[] {
+function reveal(cells: Cell[], setGameState: ((state: 'win' | 'lose')=>void), idxs: number[]): Cell[] {
   const revealed = floodfill(cells, idxs);
   let explode = false;
   const newCells = cells.map((cell, i) => {
@@ -128,8 +128,8 @@ function reveal(cells: Cell[], setGameState: ((state: string)=>void), idxs: numb
 /// Settings to generate a random game
 /// TODO
 ///  - compute whether puzzle needs guessing (when it is fully generated)
-function GeneratorSettings({disabled}) {
-  const [geom, setGeom] = useState<'square' | 'hex' | 'square (no corners)'>('square');
+function GeneratorSettings({disabled}: {disabled: boolean}) {
+  const [geom, setGeom] = useState<BoardGeometry>('square');
   const [x, setX] = useState(10);
   const [y, setY] = useState(10);
   const [mines, setMines] = useState(0);
@@ -146,27 +146,34 @@ function GeneratorSettings({disabled}) {
     noGuessing: noGuessing,
   };
   return <div className="boardgenSettings">
-    <label>Shape: <select name="geom" disabled="true" value={geom} onChange={e=>setGeom(e.target.value)}>
+    <label>Shape: <select name="geom" disabled={true} value={geom} onChange={e=>setGeom(e.target.value as BoardGeometry)}>
       <option value="square">square</option>
       <option value="hex">hex</option>
+      <option value="cross">cross</option>
     </select></label>
-    <label>Width: <input name="genX" type="number" value={x} onChange={e=>setX(e.target.value)} min="1" max="40"/></label>
-    <label>Height: <input name="genY" type="number" value={y} onChange={e=>setY(e.target.value)} min="1" max="40"/></label>
-    <label>Mines: <input name="genMines" type="number" value={mines} onChange={e=>setMines(e.target.value)} min="0" max={x*y - unkns} /></label>
-    <label>Unknowns (?): <input name="genUnkns" type="number" value={unkns} onChange={e=>setUnkns(e.target.value)} min="0" max={x*y - mines} /></label>
-    <label>No Guessing <input name="noGuessing" disabled="true" type="checkbox" value={noGuessing} onChange={e=>setGuessing(e.target.value)} /></label>
+    <label>Width: <input name="genX" type="number" value={x} onChange={e=>setX(+e.target.value)} min="1" max="40"/></label>
+    <label>Height: <input name="genY" type="number" value={y} onChange={e=>setY(+e.target.value)} min="1" max="40"/></label>
+    <label>Mines: <input name="genMines" type="number" value={mines} onChange={e=>setMines(+e.target.value)} min="0" max={x*y - unkns} /></label>
+    <label>Unknowns (?): <input name="genUnkns" type="number" value={unkns} onChange={e=>setUnkns(+e.target.value)} min="0" max={x*y - mines} /></label>
+    <label>No Guessing <input name="noGuessing" disabled={true} type="checkbox" checked={noGuessing} onChange={e=>setGuessing(e.target.checked)} /></label>
   </div>
 }
 
-function RenderGame({ game, setGame, prefs }: EimisweeperGame) {
+type GameStage = 'generating' | 'playing' | 'win' | 'lose'
+type RenderGameProps = {
+  game: EimisweeperGame
+  setGame: (game: EimisweeperGame | null) => void
+  prefs: EimisweeperSettings
+}
+function RenderGame({ game, setGame, prefs }: RenderGameProps) {
   const [board, setBoard] = useState<LiveBoard>(game.board);
-  const [generated, setGenerated] = useState<boolean>(game.generated);
+  //const [generated, setGenerated] = useState<boolean>(game.minesPlaced);
   const [hoverIdx, setHover] = useState<number | null>(null);
   const [editorMode, setEditorMode] = useState<boolean>(false);
   //const setBoardWithUndo = updater => board => {addUndo(board); return updater(board)}
   //TODO useContext/useEffect for undo stack? research
   // play info
-  const [gameStage, setGameStage] = useState<'generating' | 'playing' | 'win' | 'lose'>('playing');
+  const [gameStage, setGameStage] = useState<GameStage>('playing');
   //"Score: when winning, show time to beat; when losing show time + %cleared";
   //const [mistakes, setMistakes] = useState(0);
   //const [startTime, setStartTime] = useState(null);
@@ -186,7 +193,7 @@ function RenderGame({ game, setGame, prefs }: EimisweeperGame) {
 
   // ----------------------------------------------------- Event handlers for grid
   // Reveal cells on click
-  const gridOnClick = useCallback((e) => {
+  const gridOnClick = useCallback((e: React.MouseEvent) => {
     const i = cellIndexFromEvent(e);
     if (i===undefined) return;
     setBoard(board => {
@@ -207,7 +214,7 @@ function RenderGame({ game, setGame, prefs }: EimisweeperGame) {
   }, [setBoard, prefs]);
 
   // Flag or unflag
-  const gridOnContextmenu = useCallback((e)=>{
+  const gridOnContextmenu = useCallback((e: React.MouseEvent)=>{
     /* right-click (contextmenu) to flag/unflag a cell, unless shift is held */
     if (!e.shiftKey) {
       e.preventDefault();
@@ -240,7 +247,7 @@ function RenderGame({ game, setGame, prefs }: EimisweeperGame) {
                : "???")}
           </div>
           {board.info.showTotalQs ? <div className="found-qs">
-            {"Found " + cells.filter(c=>!c.hidden && !('number'===typeof c.content)).length
+            {"Found " + board.cells.filter(c=>!c.hidden && !('number'===typeof c.content)).length
               + "/" + board.info.totalQs + " unknowns"}
             </div> : ""}
         </div>
@@ -257,10 +264,10 @@ function RenderGame({ game, setGame, prefs }: EimisweeperGame) {
       style={{
         "--rows": board.info.y,
         "--cols": board.info.x,
-      }}
-      onClick={editorMode ? gridOnClickEditor : gridOnClick}
-      onContextMenu={editorMode ? gridOnContextmenuEditor : gridOnContextmenu}
-      onKeyDown={editorMode ? gridOnKeydownEditor : undefined}
+      } as React.CSSProperties}
+      onClick={editorMode ? gridOnClickEditor(setBoard) : gridOnClick}
+      onContextMenu={editorMode ? gridOnContextmenuEditor(setBoard) : gridOnContextmenu}
+      onKeyDown={editorMode ? gridOnKeydownEditor(setBoard) : undefined}
       >
         {board.cells.map((cell, i) =>
           <EimisweeperCell
@@ -274,8 +281,8 @@ function RenderGame({ game, setGame, prefs }: EimisweeperGame) {
             adjHover={(hoverIdx!==null) && cell.adj.includes(hoverIdx)}
             setHover={setHover}
           />)}
-        {[].map(constraint => constraint.gen(constraint))}
-        {editorMode && EditorButtons(board.info.x, board.info.y)}
+        {[].map(constraint => constraint)}
+        {editorMode && <EditorButtons x={board.info.x} y={board.info.y} setBoard={setBoard} />}
       </div>
     </div>
   </>
@@ -300,10 +307,10 @@ export default function Eimisweeper() {
   //{stage === 'menu' && renderMenu()}
   //{stage === 'random-settings' && renderBoardGenSettings()}
   //{stage === 'game' && renderGame()}
-  const [prefs, setPrefs] = useState({"chording": true, "flagging": true});
-  const [game, setGame] = useState(null)
+  const [prefs, setPrefs] = useState<EimisweeperSettings>({"chording": true, "flagging": true});
+  const [game, setGame] = useState<EimisweeperGame | null>(null)
   const [key, setKey] = useState(0);
-  const newGame = g=> {
+  const newGame = (g: EimisweeperGame | null) => {
     setKey(k=>k+1); // force game to re-render (reset state)
     setGame(g);
   }
@@ -316,7 +323,11 @@ export default function Eimisweeper() {
   </div>
 }
 
-function PuzzleInfo({puzzle, setGame}) {
+type PuzzleInfoProps = {
+  puzzle: EimisweeperPuzzleData
+  setGame: (game: EimisweeperGame | null) => void
+}
+function PuzzleInfo({puzzle, setGame}: PuzzleInfoProps) {
   return <tr className="puzzleInfo" onClick={()=>setGame(generatePuzzle(puzzle))}>
   <td>{puzzle.title}</td>
   <td>{"by " + puzzle.author}</td>
@@ -325,7 +336,10 @@ function PuzzleInfo({puzzle, setGame}) {
   </tr>
 }
 
-function GameChooser({setGame}) {
+type GameChooserProps = {
+  setGame: (game: EimisweeperGame | null) => void
+}
+function GameChooser({setGame}: GameChooserProps) {
   //const [sort, setSort] = useState(null);
   //let puzzles = puzzles.asSorted(sort);
   return <div className="game-chooser">

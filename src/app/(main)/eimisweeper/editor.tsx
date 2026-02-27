@@ -1,27 +1,29 @@
 "use client"
 
-import { Pos, Cell, BoardGeometry, BoardInfo, EimisweeperGame, serializeBoard, recreateBoard, range } from "@/data/eimisweeper";
+import { LiveBoard, serializeBoard, recreateBoard, range } from "@/data/eimisweeper";
+import { cellIndexFromEvent } from "./page"
 
+type SetBoard = (updater: (board: LiveBoard) => LiveBoard) => void
 
 /// ----------------- Editor functionality, updating size or arrangement of the grid
-function shiftCol(col, shift, setBoard) {
-  const update = board => recreateBoard({
+function shiftCol(col: number, shift: number, setBoard: SetBoard) {
+  const update = (board: LiveBoard) => recreateBoard({
     ...board,
     cells: board.cells.map(
       cell => cell.pos.x===col?{...cell, pos:{y:(cell.pos.y+shift)%board.info.y, x:col}}:cell),
   })
   setBoard(update)
 }
-function shiftRow(row, shift, setBoard) {
-  const update = board => recreateBoard({
+function shiftRow(row: number, shift: number, setBoard: SetBoard) {
+  const update = (board: LiveBoard) => recreateBoard({
     ...board,
     cells: board.cells.map(
       cell => cell.pos.y===row?{...cell, pos:{y:row, x:(cell.pos.x+shift)%board.info.x}}:cell),
   })
   setBoard(update)
 }
-function removeCol(col, setBoard) {
-  const update = board => recreateBoard({
+function removeCol(col: number, setBoard: SetBoard) {
+  const update = (board: LiveBoard) => recreateBoard({
     ...board,
     cells: board.cells.filter(cell => cell.pos.x!==col)
       .map(cell => cell.pos.x > col?{...cell, pos:{x: cell.pos.x-1, y: cell.pos.y}}:cell),
@@ -29,8 +31,8 @@ function removeCol(col, setBoard) {
   })
   setBoard(update)
 }
-function removeRow(row, setBoard) {
-  const update = board => recreateBoard({
+function removeRow(row: number, setBoard: SetBoard) {
+  const update = (board: LiveBoard) => recreateBoard({
     ...board,
     cells: board.cells.filter(cell => cell.pos.y!==row)
       .map(cell => cell.pos.y > row?{...cell, pos:{x: cell.pos.x, y: cell.pos.y-1}}:cell),
@@ -38,11 +40,11 @@ function removeRow(row, setBoard) {
   })
   setBoard(update)
 }
-function addCol(beforeCol, setBoard) {
-  const update = board => recreateBoard({
+function addCol(beforeCol: number, setBoard: SetBoard) {
+  const update = (board: LiveBoard) => recreateBoard({
     ...board,
     cells: [
-      ...cells.map((cell) => cell.pos.x < beforeCol?cell:{...cell, pos:{x:cell.pos.x+1, y:cell.pos.y}}),
+      ...board.cells.map((cell) => cell.pos.x < beforeCol?cell:{...cell, pos:{x:cell.pos.x+1, y:cell.pos.y}}),
       ...range(board.info.y).map(y=>({
         pos:{x: beforeCol, y:y},
         adj: [], content: '', isBomb: false, isOpen: false, hidden: false, flagged: false
@@ -52,11 +54,11 @@ function addCol(beforeCol, setBoard) {
   })
   setBoard(update)
 }
-function addRow(beforeRow: number, setBoard) {
-  const update = board => recreateBoard({
+function addRow(beforeRow: number, setBoard: SetBoard) {
+  const update = (board: LiveBoard) => recreateBoard({
     ...board,
     cells: [
-      ...cells.map((cell) => cell.pos.y < beforeRow?cell:{...cell, pos:{x:cell.pos.x, y:cell.pos.y+1}}),
+      ...board.cells.map((cell) => cell.pos.y < beforeRow?cell:{...cell, pos:{x:cell.pos.x, y:cell.pos.y+1}}),
       ...range(board.info.x).map(x=>({
         pos:{x: x, y: beforeRow},
         adj: [], content: '', isBomb: false, isOpen: false, hidden: false, flagged: false
@@ -67,15 +69,15 @@ function addRow(beforeRow: number, setBoard) {
   setBoard(update)
 }
 /// Editor: Fill board with all possible cells (no content).
-function addAllEmptyCells(setBoard) {
-  const update = board => recreateBoard({
+function addAllEmptyCells(setBoard: SetBoard) {
+  const update = (board: LiveBoard) => recreateBoard({
     ...board,
-    cells: [...cells,
+    cells: [...board.cells,
       ...range(board.info.x).map(x=>range(board.info.y).map(y=>({x:x,y:y})))
       .flat().filter(p=>!(p.y in board.index)||!(p.x in board.index[p.y]))
       .map(p=>({
         pos: p,
-        adj: undefined, // will be updated by recreateBoard()
+        adj: [], // will be updated by recreateBoard()
         content: '',
         isBomb: false,
         isOpen: false,
@@ -93,7 +95,7 @@ function updateContent(board: LiveBoard): LiveBoard {
     const newContent = cell.isBomb? '*' :
       'number'===typeof cell.content? bombCount :
       cell.content;
-    return (content===newContent)? cell : {
+    return (cell.content===newContent)? cell : {
       ...cell,
       content: newContent,
       isOpen: newContent===0,
@@ -108,37 +110,42 @@ function updateContent(board: LiveBoard): LiveBoard {
 interface EditorColProps {
   col: number
   lastrow: number
-  setBoard: (updater: (board: LiveBoard)=>LiveBoard)=>void
+  setBoard: SetBoard
 }
 interface EditorRowProps {
   row: number
   lastcol: number
-  setBoard: (updater: (board: LiveBoard)=>LiveBoard)=>void
+  setBoard: SetBoard
 }
 
 function EditorInsertColButton({col, lastrow, setBoard}: EditorColProps) {
-  return <button className="editor-insert col" style={{"--x": col, "--y": lastrow}} onClick={()=>addCol(col, setBoard)}>{"+"}</button>
+  return <button className="editor-insert col" style={{"--x": col, "--y": lastrow} as React.CSSProperties} onClick={()=>addCol(col, setBoard)}>{"+"}</button>
 }
 function EditorInsertRowButton({row, lastcol, setBoard}: EditorRowProps) {
-  return <button className="editor-insert row" style={{"--y": row, "--x": lastcol}} onClick={()=>addRow(row, setBoard)}>{"+"}</button>
+  return <button className="editor-insert row" style={{"--y": row, "--x": lastcol} as React.CSSProperties} onClick={()=>addRow(row, setBoard)}>{"+"}</button>
 }
 function EditorEditColButtons({col, lastrow, setBoard}: EditorColProps) {
-  return <div classname="editor-edit col" style={{"--x": col}}>
-  <button classname="shift-back" onClick={()=>shiftColumn(col, -1, setBoard)}/>
-  <button classname="remove" onClick={()=>removeCol(col, setBoard)}/>
-  <button classname="shift-forward" onclick={()=>shiftColumn(col, 1, setBoard)}/>
+  return <div className="editor-edit col" style={{"--x": col} as React.CSSProperties}>
+  <button className="shift-back" onClick={()=>shiftCol(col, -1, setBoard)}/>
+  <button className="remove" onClick={()=>removeCol(col, setBoard)}/>
+  <button className="shift-forward" onClick={()=>shiftCol(col, 1, setBoard)}/>
   </div>
 }
 function EditorEditRowButtons({row, lastcol, setBoard}: EditorRowProps) {
-  return <div classname="editor-edit row" style={{"--y": row}}>
-  <button classname="shift-back" onClick={()=>shiftRow(row, -1, setBoard)}/>
-  <button classname="remove" onClick={()=>removeRow(row, setBoard)}/>
-  <button classname="shift-forward" onclick={()=>shiftRow(row, 1, setBoard)}/>
+  return <div className="editor-edit row" style={{"--y": row} as React.CSSProperties}>
+  <button className="shift-back" onClick={()=>shiftRow(row, -1, setBoard)}/>
+  <button className="remove" onClick={()=>removeRow(row, setBoard)}/>
+  <button className="shift-forward" onClick={()=>shiftRow(row, 1, setBoard)}/>
   </div>
 }
 // All the editor buttons to add/remove/etc rows and columns of the grid.
 // These buttons are displayed as part of the grid (on the edges)
-export function EditorButtons(x: number, y: number, setBoard) {
+type EditorButtonProps = {
+  x: number
+  y: number
+  setBoard: SetBoard
+}
+export function EditorButtons({x, y, setBoard}: EditorButtonProps) {
   return <>
     {range(x+1).map((xc) => <EditorInsertColButton key={"icol"+xc} col={xc+1} lastrow={y} setBoard={setBoard} />)}
     {range(y+1).map((yc) => <EditorInsertRowButton key={"irow"+yc} row={yc+1} lastcol={x} setBoard={setBoard} />)}
@@ -148,17 +155,17 @@ export function EditorButtons(x: number, y: number, setBoard) {
 }
 
 // ----------------------------------------------------- Event handlers for Editor
-const gridOnKeydownEditor = setBoard => (e) => {
+export const gridOnKeydownEditor = (setBoard: SetBoard) => (e: React.KeyboardEvent) => {
   const i = cellIndexFromEvent(e);
   if (i===undefined) return;
   if (/[a-zA-Z0-9? ]/.test(e.key)) { // TODO backspace/del to remove/disable?
     // set content
     // TODO update Q/Mines total info based on diff, or disallow
-    setBoard(board => ({
+    setBoard((board: LiveBoard) => ({
       ...board,
       cells: board.cells.map((cell, j)=> {
         if (j===i) {
-          let content = e.key;
+          let content: number|string = e.key;
           if (/[0-9]/.test(e.key)) {
             content = +(e.key);
           }
@@ -171,25 +178,25 @@ const gridOnKeydownEditor = setBoard => (e) => {
   }
 }
 
-const gridOnClickEditor = setBoard => (e) => {
+export const gridOnClickEditor = (setBoard: SetBoard) => (e: React.MouseEvent) => {
   const i = cellIndexFromEvent(e);
   if (i===undefined) return;
   // toggle hidden
-  setBoard(board => ({
+  setBoard((board: LiveBoard) => ({
     ...board,
     cells: board.cells.map((cell,j)=>
       j===i?{...cell, hidden: !cell.hidden}: cell)
   }));
 }
 
-const gridOnContextmenuEditor = setBoard => (e)=>{
+export const gridOnContextmenuEditor = (setBoard: SetBoard) => (e: React.MouseEvent)=>{
   if (!e.shiftKey) {
     e.preventDefault();
     const i = cellIndexFromEvent(e);
     if (i===undefined) return;
     // (editor mode) toggle Bomb
     // also updates surrounding cells
-    setBoard(board => {
+    setBoard((board: LiveBoard) => {
       const diff = board.cells[i].isBomb ? -1 : 1;  // are we removing a bomb or adding it?
       const cells = board.cells.map((cell,j) => {
         if (j!==i) {
