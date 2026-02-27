@@ -11,7 +11,7 @@ type EimisweeperSettings = {
   allowChording: boolean,
 };
 
-let PresetBeginner: BoardInfo = {
+const PresetBeginner: BoardInfo = {
   noGuessing: false,
   geometry: 'square',
   x: 9,
@@ -20,7 +20,7 @@ let PresetBeginner: BoardInfo = {
   showTotalMines: true,
   totalQs: 0,
 };
-let PresetIntermediate: BoardInfo = {
+const PresetIntermediate: BoardInfo = {
   noGuessing: false,
   geometry: 'square',
   x: 16,
@@ -29,7 +29,7 @@ let PresetIntermediate: BoardInfo = {
   showTotalMines: true,
   totalQs: 0,
 };
-let PresetExpert: BoardInfo = {
+const PresetExpert: BoardInfo = {
   noGuessing: false,
   geometry: 'square',
   x: 30,
@@ -71,16 +71,17 @@ function EimisweeperCell({
     onPointerEnter={()=>setHover(idx)}
     onPointerLeave={()=>setHover(null)}
   >
-  <div>{content in sprites? sprites[content] && <img src={sprites[content]}/> : content==="*"?"💣":content}</div>
+  <div>{content in sprites? sprites[content] && <img src={sprites[content]} alt={content} /> : content==="*"?"💣":content}</div>
   </div>
 }
 
 // get cell index from propagated event.
 // Used for all events interacting with specific grid cells
+// requires that the element order matches up with cells array
+// (i.e. no other grid children before the cells)
 function cellIndexFromEvent(e) {
   // currentTarget is the grid
   if (e.target !== e.currentTarget) {
-    let idx = undefined;
     let el = e.target;
     while(el.parentElement !== e.currentTarget){
       el = el.parentElement;
@@ -95,7 +96,7 @@ function floodfill(cells: Cell[], queue: number[]): number[] {
   let cur = 0;
   // floodfill open cells
   while (cur < queue.length) {
-    let p = queue[cur];
+    const p = queue[cur];
     if (cells[p].isOpen) {
       cells[p].adj.forEach((np) => {
         if(!queue.includes(np) && !cells[np].flagged && cells[np].hidden) queue.push(np);
@@ -108,9 +109,9 @@ function floodfill(cells: Cell[], queue: number[]): number[] {
 
 /// Update cell visibility (and possibly win/loss state) by revealing cells in `idxs`
 function reveal(cells: Cell[], setGameState: ((state: string)=>void), idxs: number[]): Cell[] {
-  let revealed = floodfill(cells, idxs);
+  const revealed = floodfill(cells, idxs);
   let explode = false;
-  let newCells = cells.map((cell, i) => {
+  const newCells = cells.map((cell, i) => {
     if (revealed.includes(i)) {
       if (cell.isBomb) explode = true;
       return {...cell, hidden: false};
@@ -157,22 +158,19 @@ function GeneratorSettings({disabled}) {
   </div>
 }
 
-function RenderGame({ game, setGame }: EimisweeperGame) {
+function RenderGame({ game, setGame, prefs }: EimisweeperGame) {
   const [board, setBoard] = useState<LiveBoard>(game.board);
   const [generated, setGenerated] = useState<boolean>(game.generated);
   const [hoverIdx, setHover] = useState<number | null>(null);
   const [editorMode, setEditorMode] = useState<boolean>(false);
-  "TODO: pre-start only for random games";
-  //const setHoverLog = useCallback((x)=>{console.log("setting hover to",x); return setHover(x);}, [setHover]);
   //const setBoardWithUndo = updater => board => {addUndo(board); return updater(board)}
   //TODO useContext/useEffect for undo stack? research
-  let globalsettings = {"chording": true};
   // play info
   const [gameStage, setGameStage] = useState<'generating' | 'playing' | 'win' | 'lose'>('playing');
-  "Score: when winning, show time to beat; when losing show time + %cleared";
-  let [mistakes, setMistakes] = useState(0);
-  let [startTime, setStartTime] = useState(null);
-  let [finishTime, setFinishTime] = useState(null);
+  //"Score: when winning, show time to beat; when losing show time + %cleared";
+  //const [mistakes, setMistakes] = useState(0);
+  //const [startTime, setStartTime] = useState(null);
+  //const [finishTime, setFinishTime] = useState(null);
   // when gameStage is updated (to playing):
   //  setStartTime(now)
   //  start timer (interval to update currentTime / displayed time)
@@ -197,7 +195,7 @@ function RenderGame({ game, setGame }: EimisweeperGame) {
       else if (cell.hidden) { /* not flagged - reveal it */
         return {...board, cells: reveal(board.cells, setGameStage, [i])};
       } else { /* "chording" click on number with adjacent flags to clear rest */
-        if (globalsettings.chording===true // TODO
+        if (prefs.chording===true // TODO
             && 'number'===typeof cell.content
             && cell.content===cell.adj.filter((a)=>board.cells[a].flagged).length) {
           return {...board, cells: reveal(board.cells, setGameStage,
@@ -206,7 +204,7 @@ function RenderGame({ game, setGame }: EimisweeperGame) {
       }
       return board;
     });
-  }, [setBoard, globalsettings]);
+  }, [setBoard, prefs]);
 
   // Flag or unflag
   const gridOnContextmenu = useCallback((e)=>{
@@ -216,12 +214,14 @@ function RenderGame({ game, setGame }: EimisweeperGame) {
       const i = cellIndexFromEvent(e);
       if (i===undefined) return;
       // toggle flagged
+      if (prefs.flagging===false) return;
+      // setStatsUsedFlags(true);
       setBoard(board=>({
         ...board,
         cells: board.cells.map((cell,j)=>i===j && cell.hidden?{...cell, flagged:!cell.flagged}:cell),
       }));
     }
-  }, [setBoard]);
+  }, [setBoard, prefs]);
   // ----------------------------------------------------- Event handlers for grid
 
   return <>
@@ -300,6 +300,7 @@ export default function Eimisweeper() {
   //{stage === 'menu' && renderMenu()}
   //{stage === 'random-settings' && renderBoardGenSettings()}
   //{stage === 'game' && renderGame()}
+  const [prefs, setPrefs] = useState({"chording": true, "flagging": true});
   const [game, setGame] = useState(null)
   const [key, setKey] = useState(0);
   const newGame = g=> {
@@ -310,7 +311,7 @@ export default function Eimisweeper() {
   return <div className="eimisweeper">
     {game===null ?
       <GameChooser setGame={setGame} /> :
-      <RenderGame key={key} game={game} setGame={newGame} />
+      <RenderGame key={key} game={game} setGame={newGame} prefs={prefs} />
     }
   </div>
 }

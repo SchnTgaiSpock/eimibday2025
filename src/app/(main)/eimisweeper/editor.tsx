@@ -88,10 +88,10 @@ function addAllEmptyCells(setBoard) {
 }
 /// Editor: auto-populate content for numeric/empty cells
 function updateContent(board: LiveBoard): LiveBoard {
-  let cells = board.cells.map(cell => {
+  const cells = board.cells.map(cell => {
     const bombCount = cell.adj.filter(i=>board.cells[i].isBomb).length;
     const newContent = cell.isBomb? '*' :
-      'number'===typeof cell.content? bombcount :
+      'number'===typeof cell.content? bombCount :
       cell.content;
     return (content===newContent)? cell : {
       ...cell,
@@ -140,10 +140,10 @@ function EditorEditRowButtons({row, lastcol, setBoard}: EditorRowProps) {
 // These buttons are displayed as part of the grid (on the edges)
 export function EditorButtons(x: number, y: number, setBoard) {
   return <>
-    {range(x+1).map((xcoord) => <EditorInsertColButton col={xcoord+1} lastrow={y} setBoard={setBoard} />)}
-    {range(y+1).map((ycoord) => <EditorInsertRowButton row={ycoord+1} lastcol={x} setBoard={setBoard} />)}
-    {range(x).map((xcoord) => <EditorEditColButtons col={xcoord+1} lastrow={y} setBoard={setBoard} />)}
-    {range(y).map((ycoord) => <EditorEditRowButtons row={ycoord+1} lastcol={x} setBoard={setBoard} />)}
+    {range(x+1).map((xc) => <EditorInsertColButton key={"icol"+xc} col={xc+1} lastrow={y} setBoard={setBoard} />)}
+    {range(y+1).map((yc) => <EditorInsertRowButton key={"irow"+yc} row={yc+1} lastcol={x} setBoard={setBoard} />)}
+    {range(x).map((xc) => <EditorEditColButtons key={"ecol"+xc} col={xc+1} lastrow={y} setBoard={setBoard} />)}
+    {range(y).map((yc) => <EditorEditRowButtons key={"erow"+yc} row={yc+1} lastcol={x} setBoard={setBoard} />)}
   </>
 }
 
@@ -190,7 +190,7 @@ const gridOnContextmenuEditor = setBoard => (e)=>{
     // (editor mode) toggle Bomb
     // also updates surrounding cells
     setBoard(board => {
-      let diff = board.cells[i].isBomb ? -1 : 1;  // are we removing a bomb or adding it?
+      const diff = board.cells[i].isBomb ? -1 : 1;  // are we removing a bomb or adding it?
       const cells = board.cells.map((cell,j) => {
         if (j!==i) {
           if (cell.adj.includes(i) && 'number'===typeof cell.content) {
@@ -198,13 +198,13 @@ const gridOnContextmenuEditor = setBoard => (e)=>{
           }
           return cell;
         }
-        let nowBomb = !cell.isBomb;
+        const nowBomb = !cell.isBomb;
         const bombCount = cell.adj.filter(i=>board.cells[i].isBomb).length;
         return {
           ...cell,
           isBomb: nowBomb,
-          isOpen: !nowBomb && bombcount===0,
-          content: nowBomb? '*' : bombcount,
+          isOpen: !nowBomb && bombCount===0,
+          content: nowBomb? '*' : bombCount,
         };
       });
       return {
