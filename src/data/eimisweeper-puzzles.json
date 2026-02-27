@@ -112,5 +112,24 @@
 			"content": "02***311\n13*5*3*2\n*313354*\n*433***2\n3***7*41\n3*6***20\n2*434321\n112*11*W",
 			"visible": "VHHHHHHH\nHHHHHHHH\nHHHHHHHH\nHHHHHHHH\nHHHHHHHH\nHHHHHHHH\nHHHVVHHH\nHHHHHHHH"
 		}
+	},
+	{
+		"author": "Botch_Guy",
+		"title": "Time to gamble",
+		"date": "2026-01-30",
+		"display": {
+			"*": "EimiLooking"
+		},
+		"info": {
+			"x": 2,
+			"y": 1,
+			"totalMines": 1,
+			"showTotalMines": false,
+			"noGuessing": false
+		},
+		"data": {
+			"content": "*1",
+			"visible": "HH"
+		}
 	}
 ]
