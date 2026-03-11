@@ -1,6 +1,56 @@
 [
 	{
 		"author": "Vasher",
+		"title": "Hex Donut",
+		"date": "2026-03-10",
+		"info": {
+			"geometry": "hex",
+			"x": 7,
+			"y": 7,
+			"totalMines": 11,
+			"showTotalMines": true,
+			"noGuessing": true
+		},
+		"data": {
+			"content":"  1221\n 2***1\n 2*3221\n*21 1*1\n 112122\n 2**3*\n  *4*2",
+			"visible":"  HHHH\n HHHHH\n HHVVHH\nHHV VHH\n HHVVHH\n HHHHH\n  HHHH"
+		}
+	},
+	{
+		"author": "Vasher",
+		"title": "Hex 1",
+		"date": "2026-03-10",
+		"info": {
+			"geometry": "hex",
+			"x": 7,
+			"y": 7,
+			"totalMines": 13,
+			"showTotalMines": true,
+			"noGuessing": true
+		},
+		"data": {
+			"content":"  *2**\n 12221\n 12*311\n*2***2*\n 12*322\n 1212*\n  *11*",
+			"visible":"  HHHH\n VVVVV\n VHHHHV\nHVHHHVH\n HVHHVH\n HVHVH\n  HVVH"
+		}
+	},
+	{
+		"author": "Vasher",
+		"title": "Chessboard",
+		"date": "2026-03-10",
+		"info": {
+			"x": 7,
+			"y": 7,
+			"totalMines": 12,
+			"showTotalMines": true,
+			"noGuessing": true
+		},
+		"data": {
+			"content":"111*2*1\n* 2 3 2\n2*211*2\n1 * 2 *\n133*221\n* * * 1\n12122*1",
+			"visible":"VHVHVHV\nH H H H\nVHVHVHV\nH H H H\nVHVHVHV\nH H H H\nVHVHVHV"
+		}
+	},
+	{
+		"author": "Vasher",
 		"title": "Euphoria Hunt",
 		"date": "2026-02-10",
 		"display": {
