@@ -917,16 +917,26 @@ nav {
                 }
             }
         }
+
+        .generator-settings :invalid {
+            background-color: #c99;
+        }
+
+        .generator-settings {
+            display: flex;
+            gap: 1ch;
+
+            input[type="number"] {
+                field-sizing: content;
+                min-width: 4ch;
+            }
+        }
     }
 
     .eimisweeper-game, .eimisweeper-header {
         display: flex;
         flex-direction: column;
         align-items: center;
-    }
-
-    .generator-settings :invalid {
-        background-color: #c99;
     }
 
     .grid {

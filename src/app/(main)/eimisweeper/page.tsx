@@ -1,6 +1,6 @@
 "use client"
 
-import { Pos, Cell, BoardGeometry, BoardInfo, LiveBoard, EimisweeperGame, EimisweeperPuzzleData, puzzles, generatePuzzle, sprites } from "@/data/eimisweeper";
+import { Pos, Cell, BoardGeometry, BoardInfo, LiveBoard, EimisweeperGame, EimisweeperPuzzleData, puzzles, generatePuzzle, generateRandomBoard, sprites } from "@/data/eimisweeper";
 import { EditorButtons, gridOnClickEditor, gridOnContextmenuEditor, gridOnKeydownEditor } from "./editor"
 import { useState, useCallback } from "react";
 
@@ -10,35 +10,6 @@ type EimisweeperSettings = {
   flagging: boolean,
   chording: boolean,
 };
-
-const PresetBeginner: BoardInfo = {
-  noGuessing: false,
-  geometry: 'square',
-  x: 9,
-  y: 9,
-  totalMines: 10,
-  showTotalMines: true,
-  totalQs: 0,
-};
-const PresetIntermediate: BoardInfo = {
-  noGuessing: false,
-  geometry: 'square',
-  x: 16,
-  y: 16,
-  totalMines: 40,
-  showTotalMines: true,
-  totalQs: 0,
-};
-const PresetExpert: BoardInfo = {
-  noGuessing: false,
-  geometry: 'square',
-  x: 30,
-  y: 16,
-  totalMines: 99,
-  showTotalMines: true,
-  totalQs: 0,
-};
-
 
 interface EimisweeperCellProps {
     pos: Pos
@@ -125,44 +96,11 @@ function reveal(cells: Cell[], setGameState: ((state: 'win' | 'lose')=>void), id
   return newCells;
 }
 
-/// Settings to generate a random game
-/// TODO
-///  - compute whether puzzle needs guessing (when it is fully generated)
-function GeneratorSettings({disabled}: {disabled: boolean}) {
-  const [geom, setGeom] = useState<BoardGeometry>('square');
-  const [x, setX] = useState(10);
-  const [y, setY] = useState(10);
-  const [mines, setMines] = useState(0);
-  const [unkns, setUnkns] = useState(0); // commonly displayed as '?' or 'EimiChu'
-  const [noGuessing, setGuessing] = useState(false);
-  const info: BoardInfo = {
-    geometry: geom,
-    x: x,
-    y: y,
-    totalMines: mines,
-    showTotalMines: true,
-    totalQs: unkns,
-    showTotalQs: false,
-    noGuessing: noGuessing,
-  };
-  return <div className="boardgenSettings">
-    <label>Shape: <select name="geom" disabled={true} value={geom} onChange={e=>setGeom(e.target.value as BoardGeometry)}>
-      <option value="square">square</option>
-      <option value="hex">hex</option>
-      <option value="cross">cross</option>
-    </select></label>
-    <label>Width: <input name="genX" type="number" value={x} onChange={e=>setX(+e.target.value)} min="1" max="40"/></label>
-    <label>Height: <input name="genY" type="number" value={y} onChange={e=>setY(+e.target.value)} min="1" max="40"/></label>
-    <label>Mines: <input name="genMines" type="number" value={mines} onChange={e=>setMines(+e.target.value)} min="0" max={x*y - unkns} /></label>
-    <label>Unknowns (?): <input name="genUnkns" type="number" value={unkns} onChange={e=>setUnkns(+e.target.value)} min="0" max={x*y - mines} /></label>
-    <label>No Guessing <input name="noGuessing" disabled={true} type="checkbox" checked={noGuessing} onChange={e=>setGuessing(e.target.checked)} /></label>
-  </div>
-}
-
 type GameStage = 'generating' | 'playing' | 'win' | 'lose'
+type SetGame = (game: EimisweeperGame | null) => void
 type RenderGameProps = {
   game: EimisweeperGame
-  setGame: (game: EimisweeperGame | null) => void
+  setGame: SetGame
   prefs: EimisweeperSettings
 }
 function RenderGame({ game, setGame, prefs }: RenderGameProps) {
@@ -314,20 +252,98 @@ export default function Eimisweeper() {
     setKey(k=>k+1); // force game to re-render (reset state)
     setGame(g);
   }
+  // GeneratorSettings, PuzzleChooser are defined below
 
   return <div className="eimisweeper">
-    {game===null ?
-      <GameChooser setGame={setGame} /> :
-      <RenderGame key={key} game={game} setGame={newGame} prefs={prefs} />
-    }
+    <div className="game-chooser" style={game===null?{}:{"display":"none"}}>
+      <GeneratorSettings disabled={false} setGame={setGame} />
+      <PuzzleChooser setGame={setGame} />
+    </div>
+    {game===null?"":<RenderGame key={key} game={game} setGame={newGame} prefs={prefs} />}
+  </div>
+}
+
+// ---------------------------------------------- Game selection / menu
+const PresetBeginner: BoardInfo = {
+  noGuessing: false,
+  geometry: 'square',
+  x: 9,
+  y: 9,
+  totalMines: 10,
+  showTotalMines: true,
+  totalQs: 0,
+};
+const PresetIntermediate: BoardInfo = {
+  noGuessing: false,
+  geometry: 'square',
+  x: 16,
+  y: 16,
+  totalMines: 40,
+  showTotalMines: true,
+  totalQs: 0,
+};
+const PresetExpert: BoardInfo = {
+  noGuessing: false,
+  geometry: 'square',
+  x: 30,
+  y: 16,
+  totalMines: 99,
+  showTotalMines: true,
+  totalQs: 0,
+};
+
+
+
+/// Settings to generate a random game
+/// TODO
+///  - compute whether puzzle needs guessing (when it is fully generated)
+function GeneratorSettings({disabled, setGame}: {disabled: boolean, setGame: SetGame}) {
+  const [geom, setGeom] = useState<BoardGeometry>('square');
+  const [x, setX] = useState<number>(9);
+  const [y, setY] = useState<number>(9);
+  const [mines, setMines] = useState<number>(10);
+  const [unkns, setUnkns] = useState<number>(0); // commonly displayed as '?' or 'EimiChu'
+  const [noGuessing, setGuessing] = useState(false);
+  const info: BoardInfo = {
+    geometry: geom,
+    x: x,
+    y: y,
+    totalMines: mines,
+    showTotalMines: true,
+    totalQs: unkns,
+    showTotalQs: false,
+    noGuessing: noGuessing,
+  };
+  /*
+  */
+  return <div className="random-boardgen">
+  <div className="preset-modes">
+    <button onClick={()=>setGame({title:"Beginner", ...generateRandomBoard(PresetBeginner)})}>Generate Beginner</button>
+    <button onClick={()=>setGame({title:"Intermediate", ...generateRandomBoard(PresetIntermediate)})}>Generate Intermediate</button>
+    <button onClick={()=>setGame({title:"Expert", ...generateRandomBoard(PresetExpert)})}>Generate Expert</button>
+  </div>
+  <div className="generator-settings">
+    <label>Shape: <select name="geom" disabled={true} value={geom} onChange={e=>setGeom(e.target.value as BoardGeometry)}>
+      <option value="square">square</option>
+      <option value="hex">hex</option>
+      <option value="cross">cross</option>
+    </select></label>
+    <label>Width: <input name="genX" type="number" value={x} onChange={e=>setX(+e.target.value)} min="1" max="40"/></label>
+    <label>Height: <input name="genY" type="number" value={y} onChange={e=>setY(+e.target.value)} min="1" max="40"/></label>
+    <label>Mines: <input name="genMines" type="number" value={mines} onChange={e=>setMines(+e.target.value)} min="0" max={Math.min(999, x*y - unkns)} /></label>
+    <label>Unknowns (?): <input name="genUnkns" type="number" value={unkns} onChange={e=>setUnkns(+e.target.value)} min="0" max={Math.min(999, x*y - mines)} /></label>
+    <label>No Guessing <input name="noGuessing" disabled={true} type="checkbox" checked={noGuessing} onChange={e=>setGuessing(e.target.checked)} /></label>
+  </div>
+  <button onClick={()=>setGame({title: "Custom", ...generateRandomBoard(info)})}>Generate Custom!</button>
   </div>
 }
 
 type PuzzleInfoProps = {
   puzzle: EimisweeperPuzzleData
-  setGame: (game: EimisweeperGame | null) => void
+  setGame: SetGame
 }
 function PuzzleInfo({puzzle, setGame}: PuzzleInfoProps) {
+  // TODO: store whether a puzzle was solved in localstorage (with stats?) and display it here
   return <tr className="puzzleInfo" onClick={()=>setGame(generatePuzzle(puzzle))}>
   <td>{puzzle.title}</td>
   <td>{"by " + puzzle.author}</td>
@@ -336,13 +352,13 @@ function PuzzleInfo({puzzle, setGame}: PuzzleInfoProps) {
   </tr>
 }
 
-type GameChooserProps = {
-  setGame: (game: EimisweeperGame | null) => void
+type PuzzleChooserProps = {
+  setGame: SetGame
 }
-function GameChooser({setGame}: GameChooserProps) {
+function PuzzleChooser({setGame}: PuzzleChooserProps) {
   //const [sort, setSort] = useState(null);
   //let puzzles = puzzles.asSorted(sort);
-  return <div className="game-chooser">
+  return <>
     <table className="puzzles">
       <caption>Premade Puzzles</caption>
       <thead><tr className="puzzles-header">
@@ -352,6 +368,6 @@ function GameChooser({setGame}: GameChooserProps) {
         {puzzles.map((p,i)=>(<PuzzleInfo puzzle={p} key={i} setGame={setGame} />))}
       </tbody>
     </table>
-  </div>
+  </>
 }
 
