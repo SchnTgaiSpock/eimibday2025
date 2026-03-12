@@ -119,6 +119,7 @@ export type EimisweeperRandomBoardgen = BoardInfo
 export function range(x: number): number[] {
   return Array.from({length: x}, (_, i) => i);
 }
+const randrange = (n: number) => Math.floor(Math.random()*n);
 
 /// Export the current game (serialize but do not encode/compress)
 export function serializeBoard(game: EimisweeperGame): SerializedBoardData|null {
@@ -265,7 +266,6 @@ export function placeMines(info: BoardInfo, cells: number, safestart: number[]=[
   //  const start_idx: number = game.board.index[start.y][start.x];
   //  safestart = [start_idx, ...game.board.cells[start_idx].adj];
   //}
-  const randrange = (n: number) => Math.floor(Math.random()*n);
   const safe = range(cells); // remaining non-mine positions
   const minesToPlace = Math.min(cells - safestart.length, info.totalMines);
   for (let mines=0; mines < minesToPlace; mines++) {
@@ -322,12 +322,12 @@ export function generateRandomBoard(info: EimisweeperRandomBoardgen): Eimisweepe
       flagged: false,
     };
   });
-  // TODO place unknowns after calculating mine counts
-  // since we want to place them where they matter (ie, avoid Open cells)
-  // exception is we can place them in a dead end or 101 corner
+  // place unknowns after calculating mine counts
+  // since we want to place them where they matter (and not on top of mines)
+  const q_idxs: number[] = placeQs(cells, info.totalQs || 0);
   return {
     board: {
-      cells: cells,
+      cells: cells.map((cell, idx) => q_idxs.includes(idx)?{...cell, content: "?", isOpen: false}:cell),
       index: index,
       info: info,
     },
@@ -336,4 +336,21 @@ export function generateRandomBoard(info: EimisweeperRandomBoardgen): Eimisweepe
   };
 }
 
+function placeQs(cells: Cell[], n: number): number[] {
+  const valid: number[] = cells.filter(cell=>
+      !cell.isBomb && (
+        !cell.isOpen || // nonzero, or: zero but blocks opening of some cell
+        cell.adj.some(a=>[...new Set(cells[a].adj).intersection(new Set(cell.adj))]
+                          .every(b=>!cells[b].isOpen))
+      )
+  ).map(cell=>cells.indexOf(cell));
+  const qs: number[] = [];
+  for (let q=0; q < n && valid.length; q++) {
+    // choose a random non-mine position
+    let idx: number = randrange(valid.length);
+    // move the chosen position from safe/normal visibility to qs
+    qs.push(...valid.splice(idx, 1));
+  }
+  return qs;
+}
 

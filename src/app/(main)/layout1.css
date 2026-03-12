@@ -938,6 +938,11 @@ nav {
         flex-direction: column;
         align-items: center;
     }
+    .game-controls {
+        display: flex;
+        gap: 1ch;
+        margin-bottom: 0.5ch;
+    }
 
     .grid {
         --space-between-cells: 4px;

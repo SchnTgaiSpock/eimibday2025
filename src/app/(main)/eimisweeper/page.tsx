@@ -2,7 +2,7 @@
 
 import { Pos, Cell, BoardGeometry, BoardInfo, LiveBoard, EimisweeperGame, EimisweeperPuzzleData, puzzles, generatePuzzle, generateRandomBoard, sprites } from "@/data/eimisweeper";
 import { EditorButtons, gridOnClickEditor, gridOnContextmenuEditor, gridOnKeydownEditor } from "./editor"
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 
 /// Global game settings
 /// Flagging and Chording can be disabled
@@ -79,7 +79,7 @@ function floodfill(cells: Cell[], queue: number[]): number[] {
 }
 
 /// Update cell visibility (and possibly win/loss state) by revealing cells in `idxs`
-function reveal(cells: Cell[], setGameState: ((state: 'win' | 'lose')=>void), idxs: number[]): Cell[] {
+function reveal(cells: Cell[], setGameState: ((state: 'win' | 'lose')=>void), addMistake: ()=>void, idxs: number[]): Cell[] {
   const revealed = floodfill(cells, idxs);
   let explode = false;
   const newCells = cells.map((cell, i) => {
@@ -90,6 +90,7 @@ function reveal(cells: Cell[], setGameState: ((state: 'win' | 'lose')=>void), id
   });
   if (explode) {
     setGameState('lose');
+    addMistake();
   } else if (newCells.every(cell=>(cell.isBomb===cell.hidden))) {
     setGameState('win');
   }
@@ -104,17 +105,30 @@ type RenderGameProps = {
   prefs: EimisweeperSettings
 }
 function RenderGame({ game, setGame, prefs }: RenderGameProps) {
-  const [board, setBoard] = useState<LiveBoard>(game.board);
+  const [board, setBoardOrig] = useState<LiveBoard>(game.board);
   //const [generated, setGenerated] = useState<boolean>(game.minesPlaced);
   const [hoverIdx, setHover] = useState<number | null>(null);
   const [editorMode, setEditorMode] = useState<boolean>(false);
-  //const setBoardWithUndo = updater => board => {addUndo(board); return updater(board)}
-  //TODO useContext/useEffect for undo stack? research
+
+  const [undos, setUndos] = useState<number>(0);
+  const history = useRef<LiveBoard[]>([]); // does not affect render
+  const setBoard = useCallback((updater: (board: LiveBoard)=>LiveBoard) => {
+    setBoardOrig((board: LiveBoard) => {
+      history.current.push(board);
+      return updater(board);
+    })
+  }, [setBoardOrig]);
+  const undoBoard = useCallback(() => {
+    if (history.current.length > 0) {
+      setUndos(x=>x+1);
+      setBoardOrig(history.current.pop()!);
+    }
+  }, [setBoardOrig, setUndos]);
   // play info
   const [gameStage, setGameStage] = useState<GameStage>('playing');
   //"Score: when winning, show time to beat; when losing show time + %cleared";
-  //const [mistakes, setMistakes] = useState(0);
-  //const [startTime, setStartTime] = useState(null);
+  const [mistakes, setMistakes] = useState(0);
+  //const [startTime, setStartTime] = useState(Date.now());
   //const [finishTime, setFinishTime] = useState(null);
   // when gameStage is updated (to playing):
   //  setStartTime(now)
@@ -138,18 +152,18 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
       const cell = board.cells[i];
       if (cell.flagged) return board; /* no-op; must unflag to reveal */
       else if (cell.hidden) { /* not flagged - reveal it */
-        return {...board, cells: reveal(board.cells, setGameStage, [i])};
+        return {...board, cells: reveal(board.cells, setGameStage, ()=>setMistakes(x=>x+1), [i])};
       } else { /* "chording" click on number with adjacent flags to clear rest */
         if (prefs.chording===true // TODO
             && 'number'===typeof cell.content
             && cell.content===cell.adj.filter((a)=>board.cells[a].flagged).length) {
-          return {...board, cells: reveal(board.cells, setGameStage,
+          return {...board, cells: reveal(board.cells, setGameStage, ()=>setMistakes(x=>x+1),
             cell.adj.filter((a)=>board.cells[a].hidden && !board.cells[a].flagged))};
         }
       }
       return board;
     });
-  }, [setBoard, prefs]);
+  }, [setBoard, setGameStage, setMistakes, prefs]);
 
   // Flag or unflag
   const gridOnContextmenu = useCallback((e: React.MouseEvent)=>{
@@ -190,10 +204,11 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
             </div> : ""}
         </div>
         <div className="game-controls">
+          <button name="undo" onClick={undoBoard}>{undos?"Undo ("+undos+")":"Undo"}</button>
           <button name="reset" onClick={()=>{
             // https://react.dev/learn/preserving-and-resetting-state
             setGame({...game});
-          }}>Reset</button>
+          }}>Restart</button>
           <button name="exit-to-menu" onClick={()=>setGame(null)}>Exit to Menu</button>
         </div>
       </div>
@@ -246,7 +261,7 @@ export default function Eimisweeper() {
   //{stage === 'random-settings' && renderBoardGenSettings()}
   //{stage === 'game' && renderGame()}
   const [prefs, setPrefs] = useState<EimisweeperSettings>({"chording": true, "flagging": true});
-  const [game, setGame] = useState<EimisweeperGame | null>(null)
+  const [game, setGame] = useState<EimisweeperGame | null>(null);
   const [key, setKey] = useState(0);
   const newGame = (g: EimisweeperGame | null) => {
     setKey(k=>k+1); // force game to re-render (reset state)
@@ -314,8 +329,6 @@ function GeneratorSettings({disabled, setGame}: {disabled: boolean, setGame: Set
     showTotalQs: false,
     noGuessing: noGuessing,
   };
-  /*
-  */
   return <div className="random-boardgen">
   <div className="preset-modes">
     <button onClick={()=>setGame({title:"Beginner", ...generateRandomBoard(PresetBeginner)})}>Generate Beginner</button>
