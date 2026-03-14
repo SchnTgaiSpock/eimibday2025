@@ -109,7 +109,7 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
   const [board, setBoardOrig] = useState<LiveBoard>(game.board);
   //const [generated, setGenerated] = useState<boolean>(game.minesPlaced);
   const [hoverIdx, setHover] = useState<number | null>(null);
-  const [editorMode, setEditorMode] = useState<boolean>(false);
+  const [editorMode, setEditorMode] = useState<boolean>(game.editor || false);
 
   const [undos, setUndos] = useState<number>(0);
   const history = useRef<LiveBoard[]>([]); // does not affect render
@@ -188,7 +188,7 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
     <div className="eimisweeper-game">
       <div className="eimisweeper-header">
         <div className="title-author">
-          <span className="title">{game.title || "Random"}</span>
+          <span className="title">{editorMode? "Editor" : game.title || "Random"}</span>
           {game.author? <>{" by "}<span className="author">{game.author}</span></>:""}
           {game.date? <span className="date">{" ("+game.date+")"}</span>:""}
         </div>
@@ -349,6 +349,7 @@ function GeneratorSettings({disabled, setGame}: {disabled: boolean, setGame: Set
     <label>No Guessing <input name="noGuessing" disabled={true} type="checkbox" checked={noGuessing} onChange={e=>setGuessing(e.target.checked)} /></label>
   </div>
   <button onClick={()=>setGame({title: "Custom", ...generateRandomBoard(info)})}>Generate Custom!</button>
+  <button onClick={()=>setGame({editor: true, ...generateRandomBoard(info)})}>Puzzle Editor</button>
   </div>
 }
 

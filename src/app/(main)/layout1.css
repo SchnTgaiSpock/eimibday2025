@@ -957,20 +957,23 @@ nav {
         display: grid;
         width: fit-content;
         height: fit-content;
-        /*grid-template-columns: repeat(var(--cols), 1fr);
-        grid-template-rows: repeat(var(--rows), 1fr);*/
         grid-auto-columns: 1fr;
         grid-auto-rows: 1fr;
-        gap: var(--space-between-cells);
+        --gap-x: var(--space-between-cells);
+        --gap-y: var(--space-between-cells);
+        gap: var(--gap-y) var(--gap-x);
         font-family: "Courier New";
         font-weight: bold;
 
-        .cell {
-            user-select: none;
+        .cell, .editor-insert, .editor-edit {
             grid-row-start: calc(1 + var(--y));
             grid-row-end: span 1;
             grid-column-start: calc(1 + var(--x));
             grid-column-end: span 1;
+        }
+
+        .cell {
+            user-select: none;
             aspect-ratio: 1;
             min-width:20px;
             /*width: calc(var(--sidelen));*/
@@ -1021,21 +1024,81 @@ nav {
             visibility: hidden;
         }
     }
+
     .grid.hex {
-        /*grid-template-columns: repeat(var(--cols), 1fr);
-        grid-template-rows: repeat(var(--rows), 1fr);*/
         grid-auto-columns: 1fr 1fr;
         grid-auto-rows: 1fr 2fr;
-        gap: calc(var(--space-between-cells) * sqrt(3)) var(--space-between-cells);
+        --gap-y: calc(var(--space-between-cells) * sqrt(3));
+        --gap-x: var(--space-between-cells);
 
-        .cell {
+        .cell, .editor-insert, .editor-edit {
             grid-row-start: calc(1 + var(--y)*2);
             grid-row-end: span 3;
             grid-column-start: calc(1 + var(--x)*2 + mod(var(--y),2));
             grid-column-end: span 2;
+        }
+        .cell {
             aspect-ratio: calc(sqrt(3)/2);
             clip-path: polygon(50% 0%, 0% 25%, 0% 75%, 50% 100%, 100% 75%, 100% 25%);
         }
+    }
+
+    .grid:has(.editor-edit) {
+        grid-template-columns: repeat(var(--cols), 1fr) repeat(2, auto);
+        grid-template-rows: repeat(var(--rows), 1fr) repeat(2, auto);
+
+        .cell > div {
+            padding: 0.1ch;
+        }
+        .cell.hidden > div {
+            visibility: visible;
+            opacity: 50%;
+        }
+    }
+    .grid {
+        .editor-insert {
+            align-self: start;
+            justify-self: start;
+            position: relative;
+            aspect-ratio: 1;
+        }
+        .editor-insert.col {
+            transform: translateX(-50%);
+            left: calc(-0.5 * var(--gap-x));
+        }
+        .editor-insert.row {
+            transform: translateY(-50%);
+            top: calc(-0.5 * var(--gap-y));
+        }
+        .editor-edit {
+            display: flex;
+            flex: 1 1 0;
+            align-items: center;
+            button {
+                aspect-ratio: 1;
+            }
+            .remove:after {
+                content: "-";
+            }
+        }
+        .editor-edit.col {
+            flex-direction: column;
+            .shift-back:after {
+                content: "^";
+            }
+            .shift-forward:after {
+                content: "v";
+            }
+        }
+        .editor-edit.row {
+            .shift-back:after {
+                content: "<";
+            }
+            .shift-forward:after {
+                content: ">";
+            }
+        }
+
     }
 }
 

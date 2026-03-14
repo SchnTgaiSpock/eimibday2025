@@ -100,6 +100,7 @@ export type EimisweeperGame = {
   title?: string,
   author?: string,
   date?: string,
+  editor?: boolean,
   board: LiveBoard,
   minesPlaced: boolean, // currently unused, should always be true
   generator: EimisweeperRandomBoardgen | EimisweeperPuzzleData,
