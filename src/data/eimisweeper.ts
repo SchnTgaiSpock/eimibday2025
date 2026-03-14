@@ -135,19 +135,37 @@ const defaultSpriteMapping: Record<string, string> = {
 };
 
 /// Export the current game to clipboard
-export function exportGame(board: LiveBoard) {
+export function copyAsJSON(board: LiveBoard) {
   const data = serializeBoard(board);
   navigator.clipboard.writeText(JSON.stringify(data));
 }
+/// Start a game from clipboard
 export function importFromClipboard(): Promise<EimisweeperGame> {
-  return navigator.clipboard.readText().then(JSON.parse).then(setPuzzleDefaults).then(generatePuzzle)
+  return navigator.clipboard.readText().then(loadFromJSON);
 }
-
+/// Parse game from JSON, or throw an error if invalid
+export function loadFromJSON(json: string): EimisweeperGame {
+  return generatePuzzle(setPuzzleDefaults(JSON.parse(json.replace("_"," "))));
+}
+export function tryLoadFromJSON(json: string): EimisweeperGame | null {
+  try {
+    return loadFromJSON(json)
+  } catch (e) {
+    console.log(e);
+    console.log(json);
+    return null
+  }
+}
+/// Copy a shareable URL to the clipboard
+export function copyAsURL(board: LiveBoard) {
+  const data = JSON.stringify(serializeBoard(board)).replace(" ","_");
+  navigator.clipboard.writeText(window.location.href.split('#')[0]+'#'+data);
+}
 
 /// Export a live board to serialized JSON puzzle format (from editor)
 function serializeBoard(board: LiveBoard): UncheckedPuzzle {
-  const bombCount = board.cells.filter(cell=>cell.isBomb).length;
-  let positions = range(board.info.y).map(
+  //const bombCount = board.cells.filter(cell=>cell.isBomb).length;
+  const positions = range(board.info.y).map(
     y=>range(board.info.x)
       .map(x=>board.index[y]?board.index[y][x]:undefined)
       .map(i=>i===undefined?undefined:board.cells[i])
@@ -378,7 +396,7 @@ function placeQs(cells: Cell[], n: number): number[] {
   const qs: number[] = [];
   for (let q=0; q < n && valid.length; q++) {
     // choose a random non-mine position
-    let idx: number = randrange(valid.length);
+    const idx: number = randrange(valid.length);
     // move the chosen position from safe/normal visibility to qs
     qs.push(...valid.splice(idx, 1));
   }

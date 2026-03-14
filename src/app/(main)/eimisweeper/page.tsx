@@ -1,8 +1,8 @@
 "use client"
 
-import { Pos, Cell, BoardGeometry, BoardInfo, LiveBoard, EimisweeperGame, EimisweeperPuzzleData, puzzles, generatePuzzle, generateRandomBoard, exportGame, importFromClipboard, sprites } from "@/data/eimisweeper";
+import { Pos, Cell, BoardGeometry, BoardInfo, LiveBoard, EimisweeperGame, EimisweeperPuzzleData, puzzles, generatePuzzle, generateRandomBoard, copyAsJSON, copyAsURL, importFromClipboard, tryLoadFromJSON, sprites } from "@/data/eimisweeper";
 import { EditorButtons, gridOnClickEditor, gridOnContextmenuEditor, gridOnKeydownEditor } from "./editor"
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 
 /// Global game settings
 /// Flagging and Chording can be disabled
@@ -210,8 +210,11 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
             // https://react.dev/learn/preserving-and-resetting-state
             setGame({...game});
           }}>Restart</button>
+          {game.author?"":<button name="new-game" onClick={()=>setGame({title: game.title, ...generateRandomBoard(board.info)})}>New Game</button>}
           <button name="exit-to-menu" onClick={()=>setGame(null)}>Exit to Menu</button>
-          {editorMode ? <button name="export" onClick={()=>exportGame(board)}>Copy Puzzle to Clipboard</button>:""}
+          {editorMode ? <>
+            <button name="export" onClick={()=>copyAsJSON(board)}>Copy Puzzle to Clipboard</button>
+            <button name="share" onClick={()=>copyAsURL(board)}>Copy puzzle URL</button></>:""}
         </div>
       </div>
       <div
@@ -256,17 +259,14 @@ export default function Eimisweeper() {
   //  const puzzlesCompleted = localStorage.getItem("eimisweeper-puzzles-completed")
   //  setGameHistory(getHistoryFromStorage())
   //}, [])
-  // Game state
-  //const [stage, setStage] = useState<'menu' | 'round-select' | 'game' | 'results'>('menu')
 
-  //{stage === 'menu' && renderMenu()}
-  //{stage === 'random-settings' && renderBoardGenSettings()}
-  //{stage === 'game' && renderGame()}
   const [prefs, setPrefs] = useState<EimisweeperSettings>({"chording": true, "flagging": true});
   const [game, setGame] = useState<EimisweeperGame | null>(null);
+  useEffect(()=>setGame(tryLoadFromJSON(decodeURIComponent(window.location.hash.slice(1)))), []);
   const [key, setKey] = useState(0);
   const newGame = (g: EimisweeperGame | null) => {
     setKey(k=>k+1); // force game to re-render (reset state)
+    if (window.location.hash && g===null) window.location.hash='';
     setGame(g);
   }
   // GeneratorSettings, PuzzleChooser are defined below
