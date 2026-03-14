@@ -1071,9 +1071,10 @@ nav {
             top: calc(-0.5 * var(--gap-y));
         }
         .editor-edit {
-            display: flex;
-            flex: 1 1 0;
-            align-items: center;
+            display: grid;
+            align-self: center;
+            justify-self: center;
+            align-items: stretch;
             button {
                 aspect-ratio: 1;
             }
@@ -1082,7 +1083,6 @@ nav {
             }
         }
         .editor-edit.col {
-            flex-direction: column;
             .shift-back:after {
                 content: "^";
             }
@@ -1091,6 +1091,7 @@ nav {
             }
         }
         .editor-edit.row {
+            grid-template-columns: 1fr 1fr 1fr;
             .shift-back:after {
                 content: "<";
             }
