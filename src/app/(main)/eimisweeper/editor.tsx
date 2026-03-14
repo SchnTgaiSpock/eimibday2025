@@ -1,6 +1,6 @@
 "use client"
 
-import { LiveBoard, serializeBoard, recreateBoard, range } from "@/data/eimisweeper";
+import { LiveBoard, recreateBoard, range } from "@/data/eimisweeper";
 import { cellIndexFromEvent } from "./page"
 
 type SetBoard = (updater: (board: LiveBoard) => LiveBoard) => void

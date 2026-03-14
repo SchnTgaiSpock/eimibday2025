@@ -1,6 +1,6 @@
 "use client"
 
-import { Pos, Cell, BoardGeometry, BoardInfo, LiveBoard, EimisweeperGame, EimisweeperPuzzleData, puzzles, generatePuzzle, generateRandomBoard, sprites } from "@/data/eimisweeper";
+import { Pos, Cell, BoardGeometry, BoardInfo, LiveBoard, EimisweeperGame, EimisweeperPuzzleData, puzzles, generatePuzzle, generateRandomBoard, exportGame, sprites } from "@/data/eimisweeper";
 import { EditorButtons, gridOnClickEditor, gridOnContextmenuEditor, gridOnKeydownEditor } from "./editor"
 import { useState, useCallback, useRef } from "react";
 
@@ -211,6 +211,7 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
             setGame({...game});
           }}>Restart</button>
           <button name="exit-to-menu" onClick={()=>setGame(null)}>Exit to Menu</button>
+          {editorMode ? <button name="export" onClick={()=>exportGame(board)}>Copy Puzzle to Clipboard</button>:""}
         </div>
       </div>
       <div

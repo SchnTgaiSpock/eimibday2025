@@ -122,24 +122,50 @@ export function range(x: number): number[] {
 }
 const randrange = (n: number) => Math.floor(Math.random()*n);
 
-/// Export the current game (serialize but do not encode/compress)
-export function serializeBoard(game: EimisweeperGame): SerializedBoardData|null {
-  if (!game.minesPlaced) return null;
-  const board = game.board;
-  const content = range(board.info.y).map(
-    y => range(board.info.x).map(
-      x => (y in board.index) && (x in board.index[y]) ? board.cells[board.index[y][x]].content : ' '
-    ).join('')
-  ).join('\n');
-  const visible = range(board.info.y).map(
-    y => range(board.info.x).map(
-      x => (y in board.index) && (x in board.index[y]) ? board.cells[board.index[y][x]].hidden?'H':'V' : ' '
-    ).join('')
-  ).join('\n');
+const defaultSpriteMapping: Record<string, string> = {
+  "EimiChu":"C",
+  "EimiUeh":"X",
+  "EimiWhat":"?",
+  "EimiWota":"W",
+  "EimiLooking":"L",
+  "MuyuCool":"M",
+  "HinaHug":"H",
+  "RunieHeart":"R",
+  "SayaLove":"S"
+};
+
+/// Export the current game to clipboard
+export function exportGame(board: LiveBoard) {
+  const data = serializeBoard(board);
+  navigator.clipboard.writeText(JSON.stringify(data));
+}
+
+/// Export a live board to serialized JSON puzzle format (from editor)
+function serializeBoard(board: LiveBoard): UncheckedPuzzle {
+  const bombCount = board.cells.filter(cell=>cell.isBomb).length;
+  let positions = range(board.info.y).map(
+    y=>range(board.info.x)
+      .map(x=>board.index[y]?board.index[y][x]:undefined)
+      .map(i=>i===undefined?undefined:board.cells[i])
+  )
+  // create sprite mapping
+  const nonNumber = board.cells.map(cell=>cell.content).filter(x=>'number'!==typeof x);
+  const usedSprites = nonNumber.filter(s=>s.length>1)
+  const invert_display = Object.fromEntries(usedSprites.map(s=>[s, defaultSpriteMapping[s]]))
+  const display = Object.fromEntries(usedSprites.map(s=>[defaultSpriteMapping[s], s]))
+  const convert = (content: number | string) => invert_display[content] || content.toString()
+  // serialize board
+  const content = positions.map(row=>row.map(cell=> cell?convert(cell.content):" ").join('').trimEnd()).join('\n');
+  const visible = positions.map(row=>row.map(cell=> cell?cell.hidden?"H":"V":" ").join('').trimEnd()).join('\n');
   return {
-    content: content,
-    visible: visible,
-  };
+    title:"", author:"", date:"",
+    ...Object.keys(display).length? {"display": display}:undefined,
+    info: board.info,
+    data: {
+      content: content,
+      visible: visible,
+    }
+  }
 }
 
 /// recreate the board for a game if it has changed
