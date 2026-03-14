@@ -139,6 +139,10 @@ export function exportGame(board: LiveBoard) {
   const data = serializeBoard(board);
   navigator.clipboard.writeText(JSON.stringify(data));
 }
+export function importFromClipboard(): Promise<EimisweeperGame> {
+  return navigator.clipboard.readText().then(JSON.parse).then(setPuzzleDefaults).then(generatePuzzle)
+}
+
 
 /// Export a live board to serialized JSON puzzle format (from editor)
 function serializeBoard(board: LiveBoard): UncheckedPuzzle {

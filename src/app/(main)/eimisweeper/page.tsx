@@ -1,6 +1,6 @@
 "use client"
 
-import { Pos, Cell, BoardGeometry, BoardInfo, LiveBoard, EimisweeperGame, EimisweeperPuzzleData, puzzles, generatePuzzle, generateRandomBoard, exportGame, sprites } from "@/data/eimisweeper";
+import { Pos, Cell, BoardGeometry, BoardInfo, LiveBoard, EimisweeperGame, EimisweeperPuzzleData, puzzles, generatePuzzle, generateRandomBoard, exportGame, importFromClipboard, sprites } from "@/data/eimisweeper";
 import { EditorButtons, gridOnClickEditor, gridOnContextmenuEditor, gridOnKeydownEditor } from "./editor"
 import { useState, useCallback, useRef } from "react";
 
@@ -350,6 +350,7 @@ function GeneratorSettings({disabled, setGame}: {disabled: boolean, setGame: Set
     <label>No Guessing <input name="noGuessing" disabled={true} type="checkbox" checked={noGuessing} onChange={e=>setGuessing(e.target.checked)} /></label>
   </div>
   <button onClick={()=>setGame({title: "Custom", ...generateRandomBoard(info)})}>Generate Custom!</button>
+  <button onClick={()=>importFromClipboard().then(setGame).catch(e=>console.log(e))}>Play from Clipboard</button>
   <button onClick={()=>setGame({editor: true, ...generateRandomBoard(info)})}>Puzzle Editor</button>
   </div>
 }
