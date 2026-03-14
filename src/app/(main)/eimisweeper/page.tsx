@@ -57,6 +57,7 @@ export function cellIndexFromEvent(e: React.SyntheticEvent) {
     while(el.parentElement !== e.currentTarget){
       el = el.parentElement!;
     }
+    if (!el.classList.contains('cell')) return undefined;
     return [...el.parentElement.children].indexOf(el);
   }
 }

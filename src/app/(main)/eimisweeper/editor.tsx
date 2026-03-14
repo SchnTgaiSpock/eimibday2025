@@ -10,7 +10,7 @@ function shiftCol(col: number, shift: number, setBoard: SetBoard) {
   const update = (board: LiveBoard) => recreateBoard({
     ...board,
     cells: board.cells.map(
-      cell => cell.pos.x===col?{...cell, pos:{y:(cell.pos.y+shift)%board.info.y, x:col}}:cell),
+      cell => cell.pos.x===col?{...cell, pos:{y:(cell.pos.y+shift+board.info.y)%board.info.y, x:col}}:cell),
   })
   setBoard(update)
 }
@@ -18,7 +18,7 @@ function shiftRow(row: number, shift: number, setBoard: SetBoard) {
   const update = (board: LiveBoard) => recreateBoard({
     ...board,
     cells: board.cells.map(
-      cell => cell.pos.y===row?{...cell, pos:{y:row, x:(cell.pos.x+shift)%board.info.x}}:cell),
+      cell => cell.pos.y===row?{...cell, pos:{y:row, x:(cell.pos.x+shift+board.info.x)%board.info.x}}:cell),
   })
   setBoard(update)
 }
@@ -147,10 +147,10 @@ type EditorButtonProps = {
 }
 export function EditorButtons({x, y, setBoard}: EditorButtonProps) {
   return <>
-    {range(x+1).map((xc) => <EditorInsertColButton key={"icol"+xc} col={xc+1} lastrow={y} setBoard={setBoard} />)}
-    {range(y+1).map((yc) => <EditorInsertRowButton key={"irow"+yc} row={yc+1} lastcol={x} setBoard={setBoard} />)}
-    {range(x).map((xc) => <EditorEditColButtons key={"ecol"+xc} col={xc+1} lastrow={y} setBoard={setBoard} />)}
-    {range(y).map((yc) => <EditorEditRowButtons key={"erow"+yc} row={yc+1} lastcol={x} setBoard={setBoard} />)}
+    {range(x+1).map((xc) => <EditorInsertColButton key={"icol"+xc} col={xc} lastrow={y} setBoard={setBoard} />)}
+    {range(y+1).map((yc) => <EditorInsertRowButton key={"irow"+yc} row={yc} lastcol={x} setBoard={setBoard} />)}
+    {range(x).map((xc) => <EditorEditColButtons key={"ecol"+xc} col={xc} lastrow={y} setBoard={setBoard} />)}
+    {range(y).map((yc) => <EditorEditRowButtons key={"erow"+yc} row={yc} lastcol={x} setBoard={setBoard} />)}
   </>
 }
 
