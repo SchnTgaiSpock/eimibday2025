@@ -306,7 +306,7 @@ function BoardCells({board, display}: BoardCellsProps) {
 function SpriteMap() {
   return <div className="sprites-display">
   {Object.entries(sprites).map(([name, url], i)=>
-    <EimisweeperCell key={i} pos={{x:0,y:i}} idx={i} content={name} hidden={false} flagged={false} isBomb={false} adjHover={false} setHover={()=>{}} />)}
+    <EimisweeperCell key={i} pos={{x:i%3,y:Math.floor(i/3)}} idx={i} content={name} hidden={false} flagged={false} isBomb={false} adjHover={false} setHover={()=>{}} />)}
   </div>
 }
 
@@ -420,7 +420,7 @@ function GeneratorSettings({disabled, setGame}: {disabled: boolean, setGame: Set
     <button onClick={()=>setGame({title:"Expert", ...generateRandomBoard(PresetExpert)})}>Generate Expert</button>
   </div>
   <div className="generator-settings">
-    <label>Shape: <select name="geom" disabled={true} value={geom} onChange={e=>setGeom(e.target.value as BoardGeometry)}>
+    <label>Shape: <select name="geom" value={geom} onChange={e=>setGeom(e.target.value as BoardGeometry)}>
       <option value="square">square</option>
       <option value="hex">hex</option>
       <option value="cross">cross</option>

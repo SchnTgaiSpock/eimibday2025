@@ -24,7 +24,7 @@ export type Cell = {
   flagged: boolean,
 };
 
-export type BoardGeometry = 'square' | 'hex' | 'cross';
+export type BoardGeometry = 'square' | 'cross' | 'hex' | 'hexb';
 
 /// Implementation detail. convert from Pos(x,y)->cells[idx]
 export type PosIndex = Record<number, Record<number, number>>
@@ -297,7 +297,9 @@ export function buildAdjacency(cells: Pos[], index: PosIndex, geom: BoardGeometr
     for (const dy of [-1, 0, 1]) for (const dx of [-1,0,1])
       if ((dy!=0 || dx!=0) && (y+dy) in index && (x+dx) in index[y+dy])
         if (geom==='hex'? dy===0 || (y%2===0 ? dx <= 0 : dx >= 0) :
+            geom==='hexb'? dy===0 || (y%2===1 ? dx <= 0 : dx >= 0) :
             geom==='cross'? (dx===0 || dy===0) :
+            geom==='square'? (dx >= -1 && dx <= 1 && dy >= -1 && dy <= 1) :
             true)
         adj.push(index[y+dy][x+dx]);
     adjacent.push(adj);
@@ -338,9 +340,9 @@ export function placeMines(info: BoardInfo, cells: number, safestart: number[]=[
 
 /// Generate a board from random settings
 export function generateRandomBoard(info: EimisweeperRandomBoardgen): EimisweeperGame {
-  if (info.geometry !== 'square') {
-    throw new Error('only square games currently supported for random generation');
-  }
+  //if (info.geometry !== 'square') {
+  //  throw new Error('only square games currently supported for random generation');
+  //}
   if (info.noGuessing === true) {
     throw new Error('no-guess random games not supported yet');
   }
