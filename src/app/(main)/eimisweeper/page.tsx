@@ -152,7 +152,8 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
   const won = board.cells.every(cell=>(cell.isBomb===cell.hidden));
   const lost = board.cells.some(cell=>(cell.isBomb&&!cell.hidden));
   const gameStage: GameStage = won?'win':lost?'lose':'playing';
-  const progress = Math.floor(100*(board.cells.filter(c=>!c.isBomb&&!c.hidden).length
+  const progress = Math.floor(100*((board.cells.filter(c=>!c.isBomb&&!c.hidden).length
+                                    - game.board.cells.filter(c=>!c.hidden).length)
                                   /board.cells.filter(c=>!c.isBomb).length));
   const accuracy = Math.floor(100*Math.max(0, 1-(mistakes / board.info.totalMines)));
 
@@ -205,7 +206,6 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
           {game.date? <span className="date">{" ("+game.date+")"}</span>:""}
         </div>
         <div className="game-info">
-          <div className="game-stage">{"Game stage is: "+gameStage}</div>
           <div className="unflagged-mines">
           {"Mines Left: " + (board.info.showTotalMines
                ? board.info.totalMines - board.cells.filter(c=>c.flagged||(c.isBomb&&!c.hidden)).length
