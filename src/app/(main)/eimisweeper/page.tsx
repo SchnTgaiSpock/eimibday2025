@@ -134,26 +134,15 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
       setBoardOrig(history.current.pop()!);
     }
   }, [setBoardOrig, setUndos]);
+  const [mistakes, setMistakes] = useState(0);
+  const [startTime, _] = useState(Date.now());
   // play info
   const won = board.cells.every(cell=>(cell.isBomb===cell.hidden));
   const lost = board.cells.some(cell=>(cell.isBomb&&!cell.hidden));
   const gameStage: GameStage = won?'win':lost?'lose':'playing';
-  //"Score: when winning, show time to beat; when losing show time + %cleared";
-  const [mistakes, setMistakes] = useState(0);
-  //const [startTime, setStartTime] = useState(Date.now());
-  //const [finishTime, setFinishTime] = useState(null);
-  // when gameStage is updated (to playing):
-  //  setStartTime(now)
-  //  start timer (interval to update currentTime / displayed time)
-  //  while playing: display as currentTime() - startTime (round to seconds)
-  // when gameStage is updated (to win/loss):
-  //  setFinishTime(now)
-  //  stop timer
-  //  display game end time as finishTime - startTime (rounded)
-  // when gameStage is updated (to playing/Continue):
-  //  setFinishTime(null)
-  //  restart timer (with same startTime)
-  // when gameStage is 'generating': set start/finish to null
+  const progress = Math.floor(100*(board.cells.filter(c=>!c.isBomb&&!c.hidden).length
+                                  /board.cells.filter(c=>!c.isBomb).length));
+  const accuracy = Math.floor(100*Math.max(0, 1-(mistakes / board.info.totalMines)));
 
   // ----------------------------------------------------- Event handlers for grid
   // Reveal cells on click
@@ -227,6 +216,7 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
             <button name="export" onClick={()=>copyAsJSON(board, display)}>Copy Puzzle to Clipboard</button>
             <button name="share" onClick={()=>copyAsURL(board, display)}>Copy puzzle URL</button></>:""}
         </div>
+        <RenderWinLoss progress={progress} accuracy={accuracy} mistakes={mistakes} undoCount={undos} win={won} lose={lost} start={startTime} />
       </div>
       <Grid
         board={board}
@@ -295,6 +285,24 @@ function SpriteMap() {
   return <div className="sprites-display">
   {Object.entries(sprites).map(([name, url], i)=>
     <EimisweeperCell key={i} pos={{x:0,y:i}} idx={i} content={name} hidden={false} flagged={false} adjHover={false} setHover={()=>{}} />)}
+  </div>
+}
+
+type RenderWinLossProps = {
+  progress: number
+  accuracy: number
+  mistakes: number
+  undoCount: number
+  win: boolean
+  lose: boolean
+  start: number // time in ms
+}
+function RenderWinLoss({progress, accuracy, mistakes, undoCount, win, lose, start}: RenderWinLossProps) {
+  return <div className={"game-over-modal" + ((win||(lose&&mistakes===1))?"":" hidden") }>
+  <div>{win?"Solved!":lose?"It's over... [Undo] or [Restart]?":""}</div>
+  <div>Undos: {undoCount}</div>
+  {lose ? <div>progress: {progress}%</div> : <div>accuracy: {accuracy}%</div>}
+  <div>time: {Math.floor((Date.now() - start)/100)/10}</div>
   </div>
 }
 

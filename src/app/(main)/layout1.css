@@ -943,6 +943,18 @@ nav {
         gap: 1ch;
         margin-bottom: 0.5ch;
     }
+    .game-over-modal {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        height: 4lh;
+        transition: scale 0.5s ease 0s, height 0.5s ease 0s, opacity 0.5s linear 0s;
+    }
+    .game-over-modal.hidden {
+        height: 0;
+        opacity: 0;
+        transition: scale 0.5s ease 0s, height 0.5s ease 0s, opacity 0.5s step-start 0s;
+    }
 
     .grid {
         --space-between-cells: 4px;
