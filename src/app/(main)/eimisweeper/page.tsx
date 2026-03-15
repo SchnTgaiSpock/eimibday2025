@@ -17,6 +17,7 @@ interface EimisweeperCellProps {
     content: string | number
     hidden: boolean
     flagged: boolean
+    isBomb: boolean
     adjHover: boolean
     setHover: (arg0: number | null)=>void
 }
@@ -28,6 +29,7 @@ function EimisweeperCell({
     content,
     hidden,
     flagged,
+    isBomb,
     adjHover,
     setHover
 }: EimisweeperCellProps) {
@@ -39,11 +41,21 @@ function EimisweeperCell({
             + (flagged ?" flagged" :"")
             + (adjHover?" adjhover":"")}
     style={{"--x": pos.x, "--y": pos.y} as React.CSSProperties}
+  >
+  <div className="cell-clip"
     onPointerEnter={()=>setHover(idx)}
     onPointerLeave={()=>setHover(null)}
   >
-  <div>{content in sprites? sprites[content] && <img src={sprites[content]} alt={content.toString()} /> : content==="*"?"💣":content}</div>
+  <div>{content in sprites? sprites[content] && <Sprite content={content} isBomb={false} />
+      : content==="*"?"💣":content}</div>
   </div>
+  {isBomb && <Sprite content={content} isBomb={true} />}
+  </div>
+}
+
+type SpriteProps = {content: string | number, isBomb: boolean}
+function Sprite({content, isBomb}: SpriteProps) {
+  return <img className={isBomb?"bomb":""} src={sprites[content]} alt={content.toString()} />
 }
 
 // get cell index from propagated event.
@@ -274,6 +286,7 @@ function BoardCells({board, display}: BoardCellsProps) {
         content={display[cell.content]||cell.content}
         hidden={cell.hidden}
         flagged={cell.flagged}
+        isBomb={cell.isBomb}
         //disabled={cell.disabled}
         adjHover={(hoverIdx!==null) && cell.adj.includes(hoverIdx)}
         setHover={setHover}
@@ -284,7 +297,7 @@ function BoardCells({board, display}: BoardCellsProps) {
 function SpriteMap() {
   return <div className="sprites-display">
   {Object.entries(sprites).map(([name, url], i)=>
-    <EimisweeperCell key={i} pos={{x:0,y:i}} idx={i} content={name} hidden={false} flagged={false} adjHover={false} setHover={()=>{}} />)}
+    <EimisweeperCell key={i} pos={{x:0,y:i}} idx={i} content={name} hidden={false} flagged={false} isBomb={false} adjHover={false} setHover={()=>{}} />)}
   </div>
 }
 

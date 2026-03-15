@@ -951,6 +951,7 @@ nav {
         transition: scale 0.5s ease 0s, height 0.5s ease 0s, opacity 0.5s linear 0s;
     }
     .game-over-modal.hidden {
+        user-select: none;
         height: 0;
         opacity: 0;
         transition: scale 0.5s ease 0s, height 0.5s ease 0s, opacity 0.5s step-start 0s;
@@ -974,8 +975,12 @@ nav {
         --gap-x: var(--space-between-cells);
         --gap-y: var(--space-between-cells);
         gap: var(--gap-y) var(--gap-x);
-        font-family: "Courier New";
+        font-family: "Courier New", monospace;
         font-weight: bold;
+        img {
+            max-width: var(--img-size);
+            max-height: var(--img-size);
+        }
     }
 
     .cell, .editor-insert, .editor-edit {
@@ -988,53 +993,68 @@ nav {
     .cell {
         user-select: none;
         aspect-ratio: 1;
-        min-width:20px;
-        /*width: calc(var(--sidelen));*/
-        /*height: calc(var(--sidelen));*/
         display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: clip;
-        background-color: #dddddd;
         position: relative;
+        pointer-events: none;
 
-        div {
+        .cell-clip {
+            background-color: #dddddd;
+            aspect-ratio: inherit;
+            min-width:20px;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: clip;
+            /* clip-path applies here */
+            pointer-events: auto;
+        }
 
-            img {
-                max-width: var(--img-size);
-                max-height: var(--img-size);
-            }
+        .cell-clip > div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        img.bomb {
+            z-index: 1;
+            pointer-events: none;
+            position: absolute;
+            transition: opacity 1s ease 0s, scale 1s linear 0s;
+            opacity: 0;
+            scale: 3;
         }
     }
     .grid {
-        .cell.hidden {
+        .cell.hidden img.bomb {
+            visibility: hidden;
+            opacity: 1;
+            scale: 1;
+        }
+        .cell.hidden .cell-clip {
             background-color: #888888;
         }
-        .cell.hidden:hover {
+        .cell.hidden .cell-clip:hover {
             background-color: #aaaaaa;
         }
-        .cell.hidden.adjhover {
+        .cell.hidden.adjhover .cell-clip {
             background-color: #9999aa;
         }
 
-        .cell.hidden.flagged {
+        .cell.hidden.flagged .cell-clip {
             background-color: #cc8888;
         }
-        .cell.hidden.flagged:after {
+        .cell.hidden.flagged .cell-clip:after {
             content: "🚩";
             position: absolute;
             padding-left: 0.2em; /* flag is left-heavy */
         }
-        .cell.hidden.flagged:hover {
+        .cell.hidden.flagged .cell-clip:hover {
             background-color: #cc8888;
         }
-        .cell.hidden.flagged.adjhover {
+        .cell.hidden.flagged.adjhover .cell-clip {
             background-color: #dd9999;
         }
-        .cell.hidden > div {
+        .cell.hidden .cell-clip > div {
             visibility: hidden;
         }
     }
@@ -1053,7 +1073,9 @@ nav {
         }
         .cell {
             aspect-ratio: calc(sqrt(3)/2);
-            clip-path: polygon(50% 0%, 0% 25%, 0% 75%, 50% 100%, 100% 75%, 100% 25%);
+            .cell-clip {
+                clip-path: polygon(50% 0%, 0% 25%, 0% 75%, 50% 100%, 100% 75%, 100% 25%);
+            }
         }
     }
 
@@ -1061,7 +1083,7 @@ nav {
         grid-template-columns: repeat(var(--cols), 1fr) repeat(2, auto) repeat(3, 1fr);
         grid-template-rows: repeat(var(--rows), 1fr) repeat(2, auto);
 
-        .cell.hidden > div {
+        .cell.hidden .cell-clip > div {
             visibility: visible;
             opacity: 50%;
         }
