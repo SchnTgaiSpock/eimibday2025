@@ -1,7 +1,7 @@
 "use client"
 
 import { Pos, Cell, BoardGeometry, BoardInfo, LiveBoard, EimisweeperGame, EimisweeperPuzzleData, puzzles, generatePuzzle, generateRandomBoard, copyAsJSON, copyAsURL, importFromClipboard, tryLoadFromJSON, sprites } from "@/data/eimisweeper";
-import { EditorButtons, gridOnClickEditor, gridOnContextmenuEditor, gridOnKeydownEditor } from "./editor"
+import { updateContent, EditorButtons, gridOnClickEditor, gridOnContextmenuEditor, gridOnKeydownEditor } from "./editor"
 import { useState, useCallback, useRef, useEffect } from "react";
 
 /// Global game settings
@@ -58,8 +58,13 @@ export function cellIndexFromEvent(e: React.SyntheticEvent) {
       el = el.parentElement!;
     }
     if (!el.classList.contains('cell')) return undefined;
-    return [...el.parentElement.children].indexOf(el);
+    return [...el.parentElement?.children || []].indexOf(el);
   }
+}
+export function elementIndex(selector: string) {
+  const el = document.querySelector(selector);
+  if (el===null) return undefined;
+  return [...el.parentElement?.children || []].indexOf(el);
 }
 
 /// Floodfill: given cells being revealed, add all adjacent to zeros
@@ -110,15 +115,22 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
   //const [generated, setGenerated] = useState<boolean>(game.minesPlaced);
   const [hoverIdx, setHover] = useState<number | null>(null);
   const [editorMode, setEditorMode] = useState<boolean>(game.editor || false);
+  const [editorAutoNumbers, setAutoNumbers] = useState<boolean>(game.editor || false);
+  // grid only receives keydown elements when focused
+  // otherwise need to use an effect to add/remove the listener to document/body
 
   const [undos, setUndos] = useState<number>(0);
   const history = useRef<LiveBoard[]>([]); // does not affect render
   const setBoard = useCallback((updater: (board: LiveBoard)=>LiveBoard) => {
     setBoardOrig((board: LiveBoard) => {
       history.current.push(board);
-      return updater(board);
+      let result = updater(board);
+      if (editorAutoNumbers) {
+        result = updateContent(result); // recalculate numbers
+      }
+      return result;
     })
-  }, [setBoardOrig]);
+  }, [setBoardOrig, editorAutoNumbers]);
   const undoBoard = useCallback(() => {
     if (history.current.length > 0) {
       setUndos(x=>x+1);
@@ -210,7 +222,7 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
             // https://react.dev/learn/preserving-and-resetting-state
             setGame({...game});
           }}>Restart</button>
-          {game.author?"":<button name="new-game" onClick={()=>setGame({title: game.title, ...generateRandomBoard(board.info)})}>New Game</button>}
+          {game.author?"":<button name="new-game" onClick={()=>setGame({...game, ...generateRandomBoard(board.info)})}>New Game</button>}
           <button name="exit-to-menu" onClick={()=>setGame(null)}>Exit to Menu</button>
           {editorMode ? <>
             <button name="export" onClick={()=>copyAsJSON(board)}>Copy Puzzle to Clipboard</button>

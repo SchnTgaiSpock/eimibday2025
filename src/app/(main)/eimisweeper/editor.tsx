@@ -89,11 +89,11 @@ function addAllEmptyCells(setBoard: SetBoard) {
   setBoard(update)
 }
 /// Editor: auto-populate content for numeric/empty cells
-function updateContent(board: LiveBoard): LiveBoard {
+export function updateContent(board: LiveBoard): LiveBoard {
   const cells = board.cells.map(cell => {
     const bombCount = cell.adj.filter(i=>board.cells[i].isBomb).length;
     const newContent = cell.isBomb? '*' :
-      'number'===typeof cell.content? bombCount :
+      ('number'===typeof cell.content || cell.content==='')? bombCount :
       cell.content;
     return (cell.content===newContent)? cell : {
       ...cell,
