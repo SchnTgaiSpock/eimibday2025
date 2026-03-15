@@ -951,12 +951,15 @@ nav {
         flex-direction: column;
         position: relative;
         height: 4lh;
-        transition: scale 0.5s ease 0s, height 0.5s ease 0s, opacity 0.5s linear 0s;
+        scale: 1 1;
+        transition: scale 0.5s ease 0.4s, height 0.5s ease 0.5s, opacity 0.5s linear 0.5s;
     }
     .game-over-modal.hidden {
         user-select: none;
         height: 0;
         opacity: 0;
+        scale: 1 0;
+        transform-origin: top center;
         transition: scale 0.5s ease 0s, height 0.5s ease 0s, opacity 0.5s step-start 0s;
     }
 
@@ -1022,7 +1025,7 @@ nav {
             z-index: 1;
             pointer-events: none;
             position: absolute;
-            transition: opacity 1s ease 0s, scale 1s linear 0s;
+            transition: opacity 1s ease-in 0s, scale 1s linear 0s;
             opacity: 0;
             scale: 3;
         }
