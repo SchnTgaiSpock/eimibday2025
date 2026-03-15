@@ -125,10 +125,12 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
   const history = useRef<LiveBoard[]>([]); // does not affect render
   const setBoard = useCallback((updater: (board: LiveBoard)=>LiveBoard) => {
     setBoardOrig((board: LiveBoard) => {
-      history.current.push(board);
       let result = updater(board);
       if (editorAutoNumbers) {
         result = updateContent(result); // recalculate numbers
+      }
+      if (result!==board) {
+        history.current.push(board);
       }
       return result;
     })
@@ -190,10 +192,10 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
       // toggle flagged
       if (prefs.flagging===false) return;
       // setStatsUsedFlags(true);
-      setBoard(board=>({
+      setBoard(board=>(board.cells[i].hidden?{
         ...board,
         cells: board.cells.map((cell,j)=>i===j && cell.hidden?{...cell, flagged:!cell.flagged}:cell),
-      }));
+      }:board));
     }
   }, [setBoard, prefs]);
   // ----------------------------------------------------- Event handlers for grid
