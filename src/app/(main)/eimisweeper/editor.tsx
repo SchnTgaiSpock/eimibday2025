@@ -1,9 +1,10 @@
 "use client"
 
-import { LiveBoard, recreateBoard, range } from "@/data/eimisweeper";
-import { cellIndexFromEvent } from "./page"
+import { LiveBoard, recreateBoard, range, sprites } from "@/data/eimisweeper";
+import { cellIndexFromEvent, elementIndex } from "./page"
 
 type SetBoard = (updater: (board: LiveBoard) => LiveBoard) => void
+type SetDisplay = (updater: (display: Record<string,string>)=>Record<string,string>) => void
 
 /// ----------------- Editor functionality, updating size or arrangement of the grid
 function shiftCol(col: number, shift: number, setBoard: SetBoard) {
@@ -154,11 +155,26 @@ export function EditorButtons({x, y, setBoard}: EditorButtonProps) {
   </>
 }
 
+
 // ----------------------------------------------------- Event handlers for Editor
-export const gridOnKeydownEditor = (setBoard: SetBoard) => (e: React.KeyboardEvent) => {
-  const i = cellIndexFromEvent(e);
-  if (i===undefined) return;
-  if (/[a-zA-Z0-9? ]/.test(e.key)) { // TODO backspace/del to remove/disable?
+export const gridOnKeydownEditor = (setBoard: SetBoard, setDisplay: SetDisplay) => (e: React.KeyboardEvent) => {
+  if (e.key.length > 1) return; // Shift, Ctrl, Backspace, etc
+  let i = elementIndex(".sprites-display>.cell:hover");
+  if (i!==undefined) {
+    // set sprites display
+    if (/[a-zA-Z? ]/.test(e.key)) {
+      const sprite = Object.keys(sprites)[i];
+      setDisplay(display => Object.fromEntries(
+        [...Object.entries(display).filter(([a,b])=>b!==sprite), ...(e.key===' '?[]:[[e.key, sprite]])]));
+      e.preventDefault();
+    }
+    return
+  }
+  i = elementIndex(".grid>.cell:hover");
+  if (i===undefined) {
+    return
+  }
+  if (/[a-zA-Z0-9? ]/.test(e.key)) { // Space to remove/disable
     // set content
     // TODO update Q/Mines total info based on diff, or disallow
     setBoard((board: LiveBoard) => ({

@@ -1046,12 +1046,9 @@ nav {
     }
 
     .grid:has(.editor-edit) {
-        grid-template-columns: repeat(var(--cols), 1fr) repeat(2, auto);
+        grid-template-columns: repeat(var(--cols), 1fr) repeat(2, auto) repeat(3, 1fr);
         grid-template-rows: repeat(var(--rows), 1fr) repeat(2, auto);
 
-        .cell > div {
-            padding: 0.1ch;
-        }
         .cell.hidden > div {
             visibility: visible;
             opacity: 50%;
@@ -1101,7 +1098,18 @@ nav {
                 content: ">";
             }
         }
-
+    }
+    .sprites-display {
+        display: grid;
+        grid-template-rows: subgrid;
+        grid-template-columns: subgrid;
+        grid-column: calc(3 + var(--cols)) / -1;
+        grid-row: 1 / -1;
+        .cell {
+            grid-row: auto;
+            grid-column: auto;
+            aspect-ratio: auto;
+        }
     }
 }
 

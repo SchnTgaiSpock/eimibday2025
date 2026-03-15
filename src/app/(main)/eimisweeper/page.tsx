@@ -112,6 +112,8 @@ type RenderGameProps = {
 }
 function RenderGame({ game, setGame, prefs }: RenderGameProps) {
   const [board, setBoardOrig] = useState<LiveBoard>(game.board);
+  // display used for sprites
+  const [display, setDisplay] = useState<Record<string,string>>("display" in game.generator? (game.generator as EimisweeperPuzzleData).display as Record<string,string> : {});
   //const [generated, setGenerated] = useState<boolean>(game.minesPlaced);
   const [hoverIdx, setHover] = useState<number | null>(null);
   const [editorMode, setEditorMode] = useState<boolean>(game.editor || false);
@@ -225,8 +227,8 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
           {game.author?"":<button name="new-game" onClick={()=>setGame({...game, ...generateRandomBoard(board.info)})}>New Game</button>}
           <button name="exit-to-menu" onClick={()=>setGame(null)}>Exit to Menu</button>
           {editorMode ? <>
-            <button name="export" onClick={()=>copyAsJSON(board)}>Copy Puzzle to Clipboard</button>
-            <button name="share" onClick={()=>copyAsURL(board)}>Copy puzzle URL</button></>:""}
+            <button name="export" onClick={()=>copyAsJSON(board, display)}>Copy Puzzle to Clipboard</button>
+            <button name="share" onClick={()=>copyAsURL(board, display)}>Copy puzzle URL</button></>:""}
         </div>
       </div>
       <div
@@ -237,14 +239,15 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
       } as React.CSSProperties}
       onClick={editorMode ? gridOnClickEditor(setBoard) : gridOnClick}
       onContextMenu={editorMode ? gridOnContextmenuEditor(setBoard) : gridOnContextmenu}
-      onKeyDown={editorMode ? gridOnKeydownEditor(setBoard) : undefined}
+      onKeyDown={editorMode ? gridOnKeydownEditor(setBoard, setDisplay) : undefined}
+      tabIndex={0}
       >
         {board.cells.map((cell, i) =>
           <EimisweeperCell
             key={i}
             pos={cell.pos}
             idx={i}
-            content={cell.content}
+            content={display[cell.content]||cell.content}
             hidden={cell.hidden}
             flagged={cell.flagged}
             //disabled={cell.disabled}
@@ -253,9 +256,17 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
           />)}
         {[].map(constraint => constraint)}
         {editorMode && <EditorButtons x={board.info.x} y={board.info.y} setBoard={setBoard} />}
+        {editorMode && <SpriteMap />}
       </div>
     </div>
   </>
+}
+
+function SpriteMap() {
+  return <div className="sprites-display">
+  {Object.entries(sprites).map(([name, url], i)=>
+    <EimisweeperCell key={i} pos={{x:0,y:i}} idx={i} content={name} hidden={false} flagged={false} adjHover={false} setHover={()=>{}} />)}
+  </div>
 }
 
 export default function Eimisweeper() {

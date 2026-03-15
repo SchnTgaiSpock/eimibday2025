@@ -135,8 +135,8 @@ const defaultSpriteMapping: Record<string, string> = {
 };
 
 /// Export the current game to clipboard
-export function copyAsJSON(board: LiveBoard) {
-  const data = serializeBoard(board);
+export function copyAsJSON(board: LiveBoard, display: Record<string,string>) {
+  const data = serializeBoard(board, display);
   navigator.clipboard.writeText(JSON.stringify(data));
 }
 /// Start a game from clipboard
@@ -158,13 +158,13 @@ export function tryLoadFromJSON(json: string): EimisweeperGame | null {
   }
 }
 /// Copy a shareable URL to the clipboard
-export function copyAsURL(board: LiveBoard) {
-  const data = JSON.stringify(serializeBoard(board)).replace(" ","_");
+export function copyAsURL(board: LiveBoard, display: Record<string,string>) {
+  const data = JSON.stringify(serializeBoard(board, display)).replace(" ","_");
   navigator.clipboard.writeText(window.location.href.split('#')[0]+'#'+data);
 }
 
 /// Export a live board to serialized JSON puzzle format (from editor)
-function serializeBoard(board: LiveBoard): UncheckedPuzzle {
+function serializeBoard(board: LiveBoard, display: Record<string,string>): UncheckedPuzzle {
   //const bombCount = board.cells.filter(cell=>cell.isBomb).length;
   const positions = range(board.info.y).map(
     y=>range(board.info.x)
@@ -173,16 +173,18 @@ function serializeBoard(board: LiveBoard): UncheckedPuzzle {
   )
   // create sprite mapping
   const nonNumber = board.cells.map(cell=>cell.content).filter(x=>'number'!==typeof x);
-  const usedSprites = nonNumber.filter(s=>s.length>1)
-  const invert_display = Object.fromEntries(usedSprites.map(s=>[s, defaultSpriteMapping[s]]))
-  const display = Object.fromEntries(usedSprites.map(s=>[defaultSpriteMapping[s], s]))
+  //const usedSprites = nonNumber.filter(s=>s.length>1)
+  const usedDisplay = Object.fromEntries(Object.entries(display).filter(([c,s])=>nonNumber.includes(c)))
+  const invert_display = Object.fromEntries(Object.entries(usedDisplay).map(([c,s])=>[s,c]))
+  //const invert_display = Object.fromEntries(usedSprites.map(s=>[s, defaultSpriteMapping[s]]))
+  //const display = Object.fromEntries(usedSprites.map(s=>[defaultSpriteMapping[s], s]))
   const convert = (content: number | string) => invert_display[content] || content.toString()
   // serialize board
   const content = positions.map(row=>row.map(cell=> cell?convert(cell.content):" ").join('').trimEnd()).join('\n');
   const visible = positions.map(row=>row.map(cell=> cell?cell.hidden?"H":"V":" ").join('').trimEnd()).join('\n');
   return {
     title:"", author:"", date:"",
-    ...Object.keys(display).length? {"display": display}:undefined,
+    ...Object.keys(usedDisplay).length? {"display": usedDisplay}:undefined,
     info: board.info,
     data: {
       content: content,
