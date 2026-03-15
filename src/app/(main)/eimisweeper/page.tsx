@@ -228,6 +228,15 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
             <button name="export" onClick={()=>copyAsJSON(board, display)}>Copy Puzzle to Clipboard</button>
             <button name="share" onClick={()=>copyAsURL(board, display)}>Copy puzzle URL</button></>:""}
         </div>
+        {editorMode && <details><summary>How to use</summary>
+          <ul>
+            <li>Left-click to toggle cell visibility in the final puzzle.</li>
+            <li>Right-click to place or remove a mine.</li>
+            <li>Press any letter key or number key on a cell to mark it as that letter/number.</li>
+            <li>Sprites can be assigned to letters by pressing that key while hovering the sprite on the right.</li>
+            <li>Empty cells (by pressing Space) will be removed from the final puzzle.</li>
+            </ul>
+          </details>}
         <RenderWinLoss progress={progress} accuracy={accuracy} mistakes={mistakes} undoCount={undos} win={won} lose={lost} start={startTime} />
       </div>
       <Grid
