@@ -151,7 +151,7 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
   // play info
   const won = board.cells.every(cell=>(cell.isBomb===cell.hidden));
   const lost = board.cells.some(cell=>(cell.isBomb&&!cell.hidden));
-  const gameStage: GameStage = won?'win':lost?'lose':'playing';
+  //const gameStage: GameStage = won?'win':lost?'lose':'playing';
   const progress = Math.floor(100*((board.cells.filter(c=>!c.isBomb&&!c.hidden).length
                                     - game.board.cells.filter(c=>!c.hidden).length)
                                   /board.cells.filter(c=>!c.isBomb).length));
@@ -324,7 +324,7 @@ function RenderWinLoss({progress, accuracy, mistakes, undoCount, win, lose, star
   <div>{win?"Solved!":lose?"It's over... [Undo] or [Restart]?":""}</div>
   <div>Undos: {undoCount}</div>
   {lose ? <div>progress: {progress}%</div> : <div>accuracy: {accuracy}%</div>}
-  <div>time: {Math.floor((Date.now() - start)/100)/10}</div>
+  <div>time: {Math.floor((Date.now() - start)/100)/10}s</div>
   </div>
 }
 
