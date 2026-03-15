@@ -98,6 +98,7 @@ function reveal(cells: Cell[], addMistake: ()=>void, idxs: number[]): Cell[] {
 
 type GameStage = 'generating' | 'playing' | 'win' | 'lose'
 type SetGame = (game: EimisweeperGame | null) => void
+type SetBoard = (updater: (board: LiveBoard) => LiveBoard) => void
 type RenderGameProps = {
   game: EimisweeperGame
   setGame: SetGame
@@ -108,7 +109,6 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
   // display used for sprites
   const [display, setDisplay] = useState<Record<string,string>>("display" in game.generator? (game.generator as EimisweeperPuzzleData).display as Record<string,string> : {});
   //const [generated, setGenerated] = useState<boolean>(game.minesPlaced);
-  const [hoverIdx, setHover] = useState<number | null>(null);
   const [editorMode, setEditorMode] = useState<boolean>(game.editor || false);
   const [editorAutoNumbers, setAutoNumbers] = useState<boolean>(game.editor || false);
   // grid only receives keydown elements when focused
@@ -228,34 +228,66 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
             <button name="share" onClick={()=>copyAsURL(board, display)}>Copy puzzle URL</button></>:""}
         </div>
       </div>
-      <div
+      <Grid
+        board={board}
+        display={display}
+        editorMode={editorMode}
+        setBoard={setBoard}
+        onClick={editorMode ? gridOnClickEditor(setBoard) : gridOnClick}
+        onContextMenu={editorMode ? gridOnContextmenuEditor(setBoard) : gridOnContextmenu}
+        onKeydown={editorMode ? gridOnKeydownEditor(setBoard, setDisplay) : undefined}
+        />
+    </div>
+  </>
+}
+
+type GridProps = {
+  board: LiveBoard
+  display: Record<string,string>
+  editorMode: boolean
+  setBoard: SetBoard
+  onClick: (e: React.MouseEvent)=>void
+  onContextMenu: (e: React.MouseEvent)=>void
+  onKeydown?: (e: React.KeyboardEvent)=>void
+}
+function Grid({board, display, editorMode, setBoard, onClick, onContextMenu, onKeydown}: GridProps) {
+  return <div
       className={`grid ${board.info.geometry}`}
       style={{
         "--rows": board.info.y,
         "--cols": board.info.x,
       } as React.CSSProperties}
-      onClick={editorMode ? gridOnClickEditor(setBoard) : gridOnClick}
-      onContextMenu={editorMode ? gridOnContextmenuEditor(setBoard) : gridOnContextmenu}
-      onKeyDown={editorMode ? gridOnKeydownEditor(setBoard, setDisplay) : undefined}
+      onClick={onClick}
+      onContextMenu={onContextMenu}
+      onKeyDown={onKeydown}
       tabIndex={0}
       >
-        {board.cells.map((cell, i) =>
-          <EimisweeperCell
-            key={i}
-            pos={cell.pos}
-            idx={i}
-            content={display[cell.content]||cell.content}
-            hidden={cell.hidden}
-            flagged={cell.flagged}
-            //disabled={cell.disabled}
-            adjHover={(hoverIdx!==null) && cell.adj.includes(hoverIdx)}
-            setHover={setHover}
-          />)}
+        <BoardCells board={board} display={display}/>
         {[].map(constraint => constraint)}
         {editorMode && <EditorButtons x={board.info.x} y={board.info.y} setBoard={setBoard} />}
         {editorMode && <SpriteMap />}
       </div>
-    </div>
+}
+
+type BoardCellsProps = {
+  board: LiveBoard
+  display: Record<string, string>
+}
+function BoardCells({board, display}: BoardCellsProps) {
+  const [hoverIdx, setHover] = useState<number | null>(null);
+  return <>
+    {board.cells.map((cell, i) =>
+      <EimisweeperCell
+        key={i}
+        pos={cell.pos}
+        idx={i}
+        content={display[cell.content]||cell.content}
+        hidden={cell.hidden}
+        flagged={cell.flagged}
+        //disabled={cell.disabled}
+        adjHover={(hoverIdx!==null) && cell.adj.includes(hoverIdx)}
+        setHover={setHover}
+      />)}
   </>
 }
 
