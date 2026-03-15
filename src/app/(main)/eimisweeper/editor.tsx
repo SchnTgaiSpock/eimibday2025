@@ -175,6 +175,7 @@ export const gridOnKeydownEditor = (setBoard: SetBoard) => (e: React.KeyboardEve
       })
       //TODO info: {...board.info, ...}
     }));
+    e.preventDefault();
   }
 }
 

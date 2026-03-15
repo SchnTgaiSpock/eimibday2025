@@ -80,7 +80,7 @@ function floodfill(cells: Cell[], queue: number[]): number[] {
 }
 
 /// Update cell visibility (and possibly win/loss state) by revealing cells in `idxs`
-function reveal(cells: Cell[], setGameState: ((state: 'win' | 'lose')=>void), addMistake: ()=>void, idxs: number[]): Cell[] {
+function reveal(cells: Cell[], setGameStage: ((state: 'win' | 'lose')=>void), addMistake: ()=>void, idxs: number[]): Cell[] {
   const revealed = floodfill(cells, idxs);
   let explode = false;
   const newCells = cells.map((cell, i) => {
@@ -90,10 +90,10 @@ function reveal(cells: Cell[], setGameState: ((state: 'win' | 'lose')=>void), ad
     } else return cell;
   });
   if (explode) {
-    setGameState('lose');
+    setGameStage('lose');
     addMistake();
   } else if (newCells.every(cell=>(cell.isBomb===cell.hidden))) {
-    setGameState('win');
+    setGameStage('win');
   }
   return newCells;
 }

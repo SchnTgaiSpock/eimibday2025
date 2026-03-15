@@ -964,38 +964,40 @@ nav {
         gap: var(--gap-y) var(--gap-x);
         font-family: "Courier New";
         font-weight: bold;
+    }
 
-        .cell, .editor-insert, .editor-edit {
-            grid-row-start: calc(1 + var(--y));
-            grid-row-end: span 1;
-            grid-column-start: calc(1 + var(--x));
-            grid-column-end: span 1;
-        }
+    .cell, .editor-insert, .editor-edit {
+        grid-row-start: calc(1 + var(--y));
+        grid-row-end: span 1;
+        grid-column-start: calc(1 + var(--x));
+        grid-column-end: span 1;
+    }
 
-        .cell {
-            user-select: none;
-            aspect-ratio: 1;
-            min-width:20px;
-            /*width: calc(var(--sidelen));*/
-            /*height: calc(var(--sidelen));*/
+    .cell {
+        user-select: none;
+        aspect-ratio: 1;
+        min-width:20px;
+        /*width: calc(var(--sidelen));*/
+        /*height: calc(var(--sidelen));*/
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: clip;
+        background-color: #dddddd;
+        position: relative;
+
+        div {
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: clip;
-            background-color: #dddddd;
-            position: relative;
 
-            div {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-
-                img {
-                    max-width: var(--img-size);
-                    max-height: var(--img-size);
-                }
+            img {
+                max-width: var(--img-size);
+                max-height: var(--img-size);
             }
         }
+    }
+    .grid {
         .cell.hidden {
             background-color: #888888;
         }

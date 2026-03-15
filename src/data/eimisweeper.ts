@@ -148,6 +148,7 @@ export function loadFromJSON(json: string): EimisweeperGame {
   return generatePuzzle(setPuzzleDefaults(JSON.parse(json.replace("_"," "))));
 }
 export function tryLoadFromJSON(json: string): EimisweeperGame | null {
+  if (json.length===0) return null;
   try {
     return loadFromJSON(json)
   } catch (e) {
