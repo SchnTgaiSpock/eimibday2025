@@ -1087,7 +1087,7 @@ nav {
         }
         .editor-edit {
             --x: calc(var(--cols) + 1);
-            --y: calc(var(--rows) + 1);
+            --y: calc(max(var(--rows),3) + 1);
             grid-row-start: calc(1 + var(--y)*2);
             grid-column-start: calc(1 + var(--x)*2);
         }
@@ -1107,7 +1107,7 @@ nav {
 
     .grid:has(.editor-edit) {
         grid-template-columns: repeat(var(--cols), 1fr) repeat(2, auto) repeat(3, 1fr);
-        grid-template-rows: repeat(var(--rows), 1fr) repeat(2, auto);
+        grid-template-rows: repeat(calc(max(var(--rows),3)), 1fr) repeat(2, auto);
 
         .cell.hidden .cell-clip > div {
             visibility: visible;
@@ -1116,7 +1116,7 @@ nav {
     }
     .grid.hex:has(.editor-edit) {
         grid-template-columns: repeat(var(--cols), 1fr 1fr) 1fr repeat(2, auto) repeat(3, 1fr 1fr) 1fr;
-        grid-template-rows: repeat(var(--rows), 1fr 2fr) 1fr repeat(2, auto);
+        grid-template-rows: repeat(calc(max(var(--rows),3)), 1fr 2fr) 1fr repeat(2, auto);
         .sprites-display {
             grid-column: calc(4 + 2*var(--cols)) / -1;
         }
