@@ -85,21 +85,14 @@ function floodfill(cells: Cell[], queue: number[]): number[] {
 }
 
 /// Update cell visibility (and possibly win/loss state) by revealing cells in `idxs`
-function reveal(cells: Cell[], setGameStage: ((state: 'win' | 'lose')=>void), addMistake: ()=>void, idxs: number[]): Cell[] {
+function reveal(cells: Cell[], addMistake: ()=>void, idxs: number[]): Cell[] {
   const revealed = floodfill(cells, idxs);
-  let explode = false;
   const newCells = cells.map((cell, i) => {
     if (revealed.includes(i)) {
-      if (cell.isBomb) explode = true;
+      if (cell.isBomb) addMistake();
       return {...cell, hidden: false};
     } else return cell;
   });
-  if (explode) {
-    setGameStage('lose');
-    addMistake();
-  } else if (newCells.every(cell=>(cell.isBomb===cell.hidden))) {
-    setGameStage('win');
-  }
   return newCells;
 }
 
@@ -142,7 +135,9 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
     }
   }, [setBoardOrig, setUndos]);
   // play info
-  const [gameStage, setGameStage] = useState<GameStage>('playing');
+  const won = board.cells.every(cell=>(cell.isBomb===cell.hidden));
+  const lost = board.cells.some(cell=>(cell.isBomb&&!cell.hidden));
+  const gameStage: GameStage = won?'win':lost?'lose':'playing';
   //"Score: when winning, show time to beat; when losing show time + %cleared";
   const [mistakes, setMistakes] = useState(0);
   //const [startTime, setStartTime] = useState(Date.now());
@@ -169,18 +164,18 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
       const cell = board.cells[i];
       if (cell.flagged) return board; /* no-op; must unflag to reveal */
       else if (cell.hidden) { /* not flagged - reveal it */
-        return {...board, cells: reveal(board.cells, setGameStage, ()=>setMistakes(x=>x+1), [i])};
+        return {...board, cells: reveal(board.cells, ()=>setMistakes(x=>x+1), [i])};
       } else { /* "chording" click on number with adjacent flags to clear rest */
         if (prefs.chording===true // TODO
             && 'number'===typeof cell.content
             && cell.content===cell.adj.filter((a)=>board.cells[a].flagged).length) {
-          return {...board, cells: reveal(board.cells, setGameStage, ()=>setMistakes(x=>x+1),
+          return {...board, cells: reveal(board.cells, ()=>setMistakes(x=>x+1),
             cell.adj.filter((a)=>board.cells[a].hidden && !board.cells[a].flagged))};
         }
       }
       return board;
     });
-  }, [setBoard, setGameStage, setMistakes, prefs]);
+  }, [setBoard, setMistakes, prefs]);
 
   // Flag or unflag
   const gridOnContextmenu = useCallback((e: React.MouseEvent)=>{
