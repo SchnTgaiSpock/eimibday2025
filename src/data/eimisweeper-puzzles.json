@@ -21,7 +21,7 @@
 		"title": "Hex Donut",
 		"date": "2026-03-10",
 		"info": {
-			"geometry": "hex",
+			"geometry": "hexb",
 			"x": 7,
 			"y": 7,
 			"totalMines": 11,
@@ -29,8 +29,8 @@
 			"noGuessing": true
 		},
 		"data": {
-			"content":"  1221\n 2***1\n 2*3221\n*21 1*1\n 112122\n 2**3*\n  *4*2",
-			"visible":"  HHHH\n HHHHH\n HHVVHH\nHHV VHH\n HHVVHH\n HHHHH\n  HHHH"
+			"content":" 1221\n 2***1\n2*3221\n*21 1*1\n112122\n 2**3*\n *4*2",
+			"visible":" HHHH\n HHHHH\nHHVVHH\nHHV VHH\nHHVVHH\n HHHHH\n HHHH"
 		}
 	},
 	{
@@ -38,7 +38,7 @@
 		"title": "Hex 1",
 		"date": "2026-03-10",
 		"info": {
-			"geometry": "hex",
+			"geometry": "hexb",
 			"x": 7,
 			"y": 7,
 			"totalMines": 13,
@@ -46,8 +46,8 @@
 			"noGuessing": true
 		},
 		"data": {
-			"content":"  *2**\n 12221\n 12*311\n*2***2*\n 12*322\n 1212*\n  *11*",
-			"visible":"  HHHH\n VVVVV\n VHHHHV\nHVHHHVH\n HVHHVH\n HVHVH\n  HVVH"
+			"content":" *2**\n 12221\n12*311\n*2***2*\n12*322\n 1212*\n *11*",
+			"visible":" HHHH\n VVVVV\nVHHHHV\nHVHHHVH\nHVHHVH\n HVHVH\n HVVH"
 		}
 	},
 	{
