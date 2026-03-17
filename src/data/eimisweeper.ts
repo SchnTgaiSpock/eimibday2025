@@ -205,7 +205,7 @@ export function recreateBoard(board: LiveBoard): LiveBoard {
   // rebuild the position index
   const index = buildIndex(cell_positions);
   // rebuild the adjacency graph
-  const adjacent = buildAdjacency(cell_positions, index, board.info.geometry);
+  const adjacent = buildAdjacency(cell_positions, index, board.info.geometry, undefined);
   // update the adjacency for all cells
   return {
     cells: sorted_cells.map((cell, i) => ({...cell, adj: adjacent[i]})),
@@ -220,10 +220,10 @@ export function generatePuzzle(gen: EimisweeperPuzzleData): EimisweeperGame {
   let x: number = 0;
   let y: number = 0;
   const content: string = gen.data.content;
-  const visible: string = gen.data.visible;
+  const visible: string = gen.data.visible; // overloaded to store custom constraint info
   if (content.length !== visible.length) throw new Error("invalid puzzle data");
   const cell_content: string[] = [];
-  const cell_visible: boolean[] = [];
+  const cell_visible: string[] = [];
   let ci = 0;
   for (const c of content) {
     const v: string = visible[ci];
@@ -234,17 +234,17 @@ export function generatePuzzle(gen: EimisweeperPuzzleData): EimisweeperGame {
       x = 0;
       y++;
     } else {
-      if (c!=' ') { // don't create a cell for spaces; position is empty
+      if (c!==' ') { // don't create a cell for spaces; position is empty
         cell_positions.push({x: x, y: y});
 	cell_content.push(c);
-	cell_visible.push(v==="V");
+	cell_visible.push(v);
       }
       x++;
     }
     ci++;
   }
   const index = buildIndex(cell_positions);
-  const adjacent = buildAdjacency(cell_positions, index, gen.info.geometry);
+  const adjacent = buildAdjacency(cell_positions, index, gen.info.geometry, cell_visible);
   const cells: Cell[] = [];
   let idx = 0;
   for (const pos of cell_positions) {
@@ -258,10 +258,13 @@ export function generatePuzzle(gen: EimisweeperPuzzleData): EimisweeperGame {
       content: content,
       isBomb: cell_content[idx]==='*',
       isOpen: cell_content[idx]==='0',
-      hidden: !cell_visible[idx],
+      hidden: cell_visible[idx]==='H', // only H is hidden; special constraint cells cannot hold mines
       flagged: false,
     });
     idx++;
+  }
+  if (cells.some(cell => cell.isBomb && !cell.hidden)) {
+    throw new Error("invalid board: mines must be hidden with H");
   }
   return {
     board: {
@@ -292,21 +295,43 @@ export function buildIndex(cells: Pos[]): PosIndex {
 }
 
 /// Build the cell adjacency graph (cell idx -> [cell idx])
-export function buildAdjacency(cells: Pos[], index: PosIndex, geom: BoardGeometry): number[][] {
+export function buildAdjacency(cells: Pos[], index: PosIndex, geom: BoardGeometry, constraint_type: string[] | undefined): number[][] {
+  // special constraints
+  const equal = (f: (p: Pos) => number) => (pos: Pos) => ([p2,i2]: [Pos,number]) => f(p2)===f(pos)
+  // H, V are already reserved for default neighbour constraints
+  const line_funcs: Record<string, (a: Pos)=>(b:[Pos,number])=>boolean> = {
+    "R": equal(p => p.y), // Row: equal y
+    "C": equal((p: Pos) => p.x), // Column: equal x
+    "D": equal((geom==='hex'||geom==='hexb')?  // Diagonal topleft->bottomright
+      (p: Pos) => (Math.floor((geom==='hexb'?p.y+1:p.y)/2) - p.x) :
+      (p: Pos) => (p.x - p.y)),
+    "d": equal((geom==='hex'||geom==='hexb')?  // Diagonal topright->bottomleft
+      (p: Pos) => (Math.floor((geom==='hexb'?p.y:p.y+1)/2) + p.x):
+      (p: Pos) => (p.x + p.y))
+  }
   const adjacent: number[][] = [];
+  var i = 0;
   for (const pos of cells) {
-    const adj: number[] = [];
+    let adj: number[] = [];
     const x = pos.x;
     const y = pos.y;
-    for (const dy of [-1, 0, 1]) for (const dx of [-1,0,1])
-      if ((dy!=0 || dx!=0) && (y+dy) in index && (x+dx) in index[y+dy])
-        if (geom==='hex'? dy===0 || (y%2===0 ? dx <= 0 : dx >= 0) :
-            geom==='hexb'? dy===0 || (y%2===1 ? dx <= 0 : dx >= 0) :
-            geom==='cross'? (dx===0 || dy===0) :
-            geom==='square'? (dx >= -1 && dx <= 1 && dy >= -1 && dy <= 1) :
-            true)
-        adj.push(index[y+dy][x+dx]);
-    adjacent.push(adj);
+    // check the type of constraint: default is 'neighbourhood'
+    // special ones currently include: Entire lines (row, column, diagonal)
+    // potential future: colored areas
+    if (constraint_type && line_funcs[constraint_type[i]]) {
+      adj = cells.map((p2, i2) => [p2,i2] as [Pos,number]).filter(line_funcs[constraint_type[i]](pos)).map(([p2,i2])=>i2)
+    } else {
+      for (const dy of [-1, 0, 1]) for (const dx of [-1,0,1])
+        if ((dy!=0 || dx!=0) && (y+dy) in index && (x+dx) in index[y+dy])
+          if (geom==='hex'? dy===0 || (y%2===0 ? dx <= 0 : dx >= 0) :
+              geom==='hexb'? dy===0 || (y%2===1 ? dx <= 0 : dx >= 0) :
+              geom==='cross'? (dx===0 || dy===0) :
+              geom==='square'? (dx >= -1 && dx <= 1 && dy >= -1 && dy <= 1) :
+              true)
+          adj.push(index[y+dy][x+dx]);
+    }
+    adjacent.push(adj.filter(j=>j!==i)); // ensure not adjacent to self
+    i++;
   }
   return adjacent;
 }
@@ -355,13 +380,14 @@ export function generateRandomBoard(info: EimisweeperRandomBoardgen): Eimisweepe
   const cell_positions: Pos[] = [];
   for (let y=0; y < info.y; y++) {
     for (let x=0; x < info.x; x++) {
-      // positions can be included/excluded based on geometry
+      // positions can be included/excluded based on geometry (e.g. hexagon in hex geometry)
       cell_positions.push({x: x, y: y,});
     }
   }
   const index = buildIndex(cell_positions);
   // calculate cell adjacency according to geometry and build real list
-  const adjacent: number[][] = buildAdjacency(cell_positions, index, info.geometry);
+  // (don't use any special constraints?)
+  const adjacent: number[][] = buildAdjacency(cell_positions, index, info.geometry, undefined);
   // place mines (TODO: currently no safe zone; you can instantly lose
   const mine_idxs: number[] = placeMines(info, cell_positions.length);
   const cells = cell_positions.map((pos, idx) => {
