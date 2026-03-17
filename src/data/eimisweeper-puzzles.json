@@ -1,6 +1,23 @@
 [
 	{
 		"author": "Vasher",
+		"title": "Where did my corners go?",
+		"date": "2026-03-16",
+		"info": {
+			"geometry": "cross",
+			"x": 5,
+			"y": 5,
+			"totalMines": 9,
+			"showTotalMines": true,
+			"noGuessing": true
+		},
+		"data": {
+			"content":"02*3*\n1*3*2\n02011\n2*22*\n*3**2",
+			"visible":"VVHHH\nVHHHH\nHHHHH\nHHHHH\nHHHHH"
+		}
+	},
+	{
+		"author": "Vasher",
 		"title": "Hex Donut",
 		"date": "2026-03-10",
 		"info": {
