@@ -298,7 +298,7 @@ function BoardCells({board, display}: BoardCellsProps) {
         flagged={cell.flagged}
         isBomb={cell.isBomb}
         //disabled={cell.disabled}
-        adjHover={(hoverIdx!==null) && cell.adj.includes(hoverIdx)}
+        adjHover={(hoverIdx!==null) && board.cells[hoverIdx].adj.includes(i)}
         setHover={setHover}
       />)}
   </>
