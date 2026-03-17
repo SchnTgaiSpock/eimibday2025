@@ -53,6 +53,7 @@ export type EimisweeperPuzzleData = {
   author: string,
   date: string,
   display?: Record<string,string>, // override things to display a certain way, eg emotes/images
+  comment?: string,
   info: BoardInfo,
   data: SerializedBoardData,
 };
@@ -61,6 +62,7 @@ type UncheckedPuzzle = {
   author: string,
   date: string,
   display?: Record<string,string>, // override things to display a certain way, eg emotes/images
+  comment?: string,
   info: {
     geometry?: BoardGeometry,
     x: number,
@@ -100,6 +102,7 @@ export type EimisweeperGame = {
   title?: string,
   author?: string,
   date?: string,
+  comment?: string,
   editor?: boolean,
   board: LiveBoard,
   minesPlaced: boolean, // currently unused, should always be true
@@ -269,6 +272,7 @@ export function generatePuzzle(gen: EimisweeperPuzzleData): EimisweeperGame {
     title: gen.title,
     author: gen.author,
     date: gen.date,
+    comment: gen.comment,
     minesPlaced: true,
     generator: gen,
   };
@@ -340,9 +344,6 @@ export function placeMines(info: BoardInfo, cells: number, safestart: number[]=[
 
 /// Generate a board from random settings
 export function generateRandomBoard(info: EimisweeperRandomBoardgen): EimisweeperGame {
-  //if (info.geometry !== 'square') {
-  //  throw new Error('only square games currently supported for random generation');
-  //}
   if (info.noGuessing === true) {
     throw new Error('no-guess random games not supported yet');
   }

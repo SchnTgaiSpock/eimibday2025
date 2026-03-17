@@ -216,6 +216,7 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
               + "/" + board.info.totalQs + " unknowns"}
             </div> : ""}
         </div>
+        {game.comment}
         <div className="game-controls">
           <button name="undo" onClick={undoBoard}>{undos?"Undo ("+undos+")":"Undo"}</button>
           <button name="reset" onClick={()=>{
