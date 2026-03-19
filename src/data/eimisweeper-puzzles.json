@@ -1,0 +1,220 @@
+[
+	{
+		"author": "Vasher",
+		"title": "Where did my corners go?",
+		"date": "2026-03-16",
+		"info": {
+			"geometry": "cross",
+			"x": 5,
+			"y": 5,
+			"totalMines": 9,
+			"showTotalMines": true,
+			"noGuessing": true
+		},
+		"data": {
+			"content":"02*3*\n1*3*2\n02011\n2*22*\n*3**2",
+			"visible":"VVHHH\nVHHHH\nHHHHH\nHHHHH\nHHHHH"
+		}
+	},
+	{
+		"author": "Vasher",
+		"title": "Hex Donut",
+		"date": "2026-03-10",
+		"info": {
+			"geometry": "hexb",
+			"x": 7,
+			"y": 7,
+			"totalMines": 11,
+			"showTotalMines": true,
+			"noGuessing": true
+		},
+		"data": {
+			"content":" 1221\n 2***1\n2*3221\n*21 1*1\n112122\n 2**3*\n *4*2",
+			"visible":" HHHH\n HHHHH\nHHVVHH\nHHV VHH\nHHVVHH\n HHHHH\n HHHH"
+		}
+	},
+	{
+		"author": "Vasher",
+		"title": "Hex 1",
+		"date": "2026-03-10",
+		"info": {
+			"geometry": "hexb",
+			"x": 7,
+			"y": 7,
+			"totalMines": 13,
+			"showTotalMines": true,
+			"noGuessing": true
+		},
+		"data": {
+			"content":" *2**\n 12221\n12*311\n*2***2*\n12*322\n 1212*\n *11*",
+			"visible":" HHHH\n VVVVV\nVHHHHV\nHVHHHVH\nHVHHVH\n HVHVH\n HVVH"
+		}
+	},
+	{
+		"author": "Vasher",
+		"title": "Chessboard",
+		"date": "2026-03-10",
+		"info": {
+			"x": 7,
+			"y": 7,
+			"totalMines": 12,
+			"showTotalMines": true,
+			"noGuessing": true
+		},
+		"data": {
+			"content":"111*2*1\n* 2 3 2\n2*211*2\n1 * 2 *\n133*221\n* * * 1\n12122*1",
+			"visible":"VHVHVHV\nH H H H\nVHVHVHV\nH H H H\nVHVHVHV\nH H H H\nVHVHVHV"
+		}
+	},
+	{
+		"author": "Vasher",
+		"title": "Sudoku?",
+		"date": "2026-02-23",
+		"comment": "Each column has a different number of mines.",
+		"display": {"C":"EimiChu","?":"EimiWhat"},
+		"info": {
+			"x": 11,
+			"y": 11,
+			"totalMines": 45,
+			"showTotalMines": true,
+			"noGuessing": true
+		},
+		"data": {
+			"content":"2**4**421 4\n3**6****? 6\n4**7**C*4 5\n********* 9\n47*7*7664 2\n***6***** 8\n3**5***** 7\n1335*6432 1\n01*3**100 3\n\n   1",
+			"visible":"HHHHHHHHH R\nHHHHHHHHH R\nHHHHHHHHH R\nHHHHHHHHH R\nHHHHHHHHH R\nHHHHHHHHH R\nHHHHHHHHH R\nHHHHHHHHH R\nHHHHHHHHH R\n\n   C"
+		}
+	},
+	{
+		"author": "Vasher",
+		"title": "Euphoria Hunt",
+		"date": "2026-02-10",
+		"display": {
+			"H": "HinaHug",
+			"M": "MuyuCool",
+			"R": "RunieHeart",
+			"S": "SayaLove"
+		},
+		"info": {
+			"x": 10,
+			"y": 8,
+			"totalMines": 32,
+			"showTotalMines": true,
+			"noGuessing": true
+		},
+		"data": {
+			"content":"01**2101**\n1224*433H*\n*102****5*\n12122334**\nM1*10013**\n1232112*5*\n2*4*44*5S*\n*R********",
+			"visible":"VHHHHHHHHH\nHHHHHHHHHH\nHHHHHHHHHH\nHHHHHHHHHH\nHHHHHHHHHH\nHHHHHHHHHH\nHHHHHHHHHH\nHHHHHHHHHH"
+		}
+	},
+	{
+		"author": "Vasher",
+		"title": "Rows",
+		"date": "2026-02-09",
+		"display": {
+			"?": "EimiChu"
+		},
+		"info": {
+			"x": 9,
+			"y": 9,
+			"totalMines": 24,
+			"showTotalMines": true,
+			"noGuessing": true
+		},
+		"data": {
+			"content": "01*11*100\n233221222\n**4*322**\n**4**2*3?\n233333332\n13*21*3**\n1**212*4*\n233322232\n*11**11*1",
+			"visible": "HHHHHHHHH\nVVVVVVVVV\nHHHHHHHHH\nHHHHHHHHH\nVVVVVVVVV\nHHHHHHHHH\nHHHHHHHHH\nVVVVVVVVV\nHHHHHHHHH"
+		}
+	},
+	{
+		"author": "Vasher",
+		"title": "puzzle 3",
+		"date": "2026-02-08",
+		"info": {
+			"x": 9,
+			"y": 3,
+			"totalMines": 10,
+			"showTotalMines": false,
+			"noGuessing": true
+		},
+		"data": {
+			"content": "1**11***1\n134334642\n01**2***1",
+			"visible": "HHHHHHHHH\nVHVHVHVHV\nHHHHHHHHH"
+		}
+	},
+	{
+		"author": "Vasher",
+		"title": "Snowflake",
+		"date": "2026-02-07",
+		"display": {
+			"?": "EimiChu"
+		},
+		"info": {
+			"x": 7,
+			"y": 7,
+			"totalMines": 13,
+			"showTotalMines": false,
+			"noGuessing": true
+		},
+		"data": {
+			"content": "1*2?2*1\n?2*?*2?\n1?242?1\n*2*3*2*\n1?3*3?1\n?2*3*2?\n1*2?2*1",
+			"visible": "VHHHHHV\nHVHHHVH\nHHVHVHH\nHVHVHVH\nVHVHVHV\nHVHVHVH\nVHVHVHV"
+		}
+	},
+	{
+		"author": "Vasher",
+		"title": "puzzle 2",
+		"date": "2026-02-06",
+		"display": {
+			"?": "EimiChu"
+		},
+		"info": {
+			"x": 9,
+			"y": 7,
+			"totalMines": 16,
+			"showTotalMines": false,
+			"noGuessing": true
+		},
+		"data": {
+			"content": "*2*10?**\n?312123?\n*22?*22*\n13**3*3?\n?2*3?12*\n2322112?\n**11*?1*",
+			"visible": "HHHHHHHH\nHVVVVVVH\nHVHHHHVH\nHVHHHHVH\nHVHHHHVH\nHVVVVVVH\nHHHHHHHH"
+		}
+	},
+	{
+		"author": "Vasher",
+		"title": "puzzle 1",
+		"date": "2026-01-30",
+		"display": {
+			"W": "EimiWota"
+		},
+		"info": {
+			"x": 8,
+			"y": 8,
+			"totalMines": 16,
+			"showTotalMines": false,
+			"noGuessing": true
+		},
+		"data": {
+			"content": "02***311\n13*5*3*2\n*313354*\n*433***2\n3***7*41\n3*6***20\n2*434321\n112*11*W",
+			"visible": "VHHHHHHH\nHHHHHHHH\nHHHHHHHH\nHHHHHHHH\nHHHHHHHH\nHHHHHHHH\nHHHVVHHH\nHHHHHHHH"
+		}
+	},
+	{
+		"author": "Botch_Guy",
+		"title": "Time to gamble",
+		"date": "2026-01-30",
+		"display": {
+			"*": "EimiLooking"
+		},
+		"info": {
+			"x": 2,
+			"y": 1,
+			"totalMines": 1,
+			"showTotalMines": false,
+			"noGuessing": false
+		},
+		"data": {
+			"content": "*1",
+			"visible": "HH"
+		}
+	}
+]

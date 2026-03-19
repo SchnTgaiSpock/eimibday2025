@@ -177,6 +177,14 @@ nav {
         &:nth-of-type(4) .sidebar-link {
             left: -90px;
             padding-left: 105px;
+            color: var(--theme-text-dark);
+            background-color: var(--theme-pink);
+            clip-path: polygon(90% 0, 100% 50%, 90% 100%, 0 100%, 0 0);
+        }
+
+	&:nth-of-type(5) .sidebar-link {
+            left: -95px;
+            padding-left: 110px;
             background-color: var(--theme-primary);
             clip-path: polygon(90% 0, 100% 50%, 90% 100%, 0 100%, 0 0);
         }
@@ -874,6 +882,306 @@ nav {
                     }
                 }
             }
+        }
+    }
+}
+
+.eimisweeper {
+    font-size: 1.4rem;
+    width: 100%;
+    height: calc(100vh - 122px); /* TODO better layout */
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .game-chooser {
+        table.puzzles {
+            tr {
+                background-color:#ccc;
+            }
+            tr:nth-child(2n) {
+                background-color:#ddd;
+            }
+            tbody {
+                tr {
+                    cursor: pointer;
+                }
+                tr:hover {
+                    opacity: 0.8;
+                }
+                td {
+                    text-align: center;
+                    padding-left: 1ch;
+                    padding-right: 1ch;
+                }
+            }
+        }
+
+        .generator-settings :invalid {
+            background-color: #c99;
+        }
+
+        .generator-settings {
+            display: flex;
+            gap: 1ch;
+
+            input[type="number"] {
+                field-sizing: content;
+                min-width: 4ch;
+            }
+        }
+    }
+
+    .eimisweeper-game, .eimisweeper-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        details {
+            max-width: 80%;
+        }
+    }
+    .game-controls {
+        display: flex;
+        gap: 1ch;
+        margin-bottom: 0.5ch;
+    }
+    .game-over-modal {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        height: 4lh;
+        scale: 1 1;
+        transition: scale 0.5s ease 0.9s, height 0.5s ease 1s, opacity 0.5s linear 1s;
+    }
+    .game-over-modal.win {
+        transition: scale 0.5s ease 0s, height 0.5s ease 0.1s, opacity 0.5s linear 0.1s;
+    }
+    .game-over-modal.hidden {
+        user-select: none;
+        height: 0;
+        opacity: 0;
+        scale: 1 0;
+        transform-origin: top center;
+        transition: scale 0.5s ease 0s, height 0.5s ease 0s, opacity 0.5s step-start 0s;
+    }
+
+    .grid {
+        --space-between-cells: 4px;
+        /* not currently used; can use with grid-template-columns/rows,
+         * or explicit width+height on cells */
+        --cell-sidelen: 40px;
+        /* This is the main factor that changes grid size currently.
+         * 3ch is enough padding while also fitting a decent number of cells */
+        --img-size: 3ch;
+        padding: var(--space-between-cells);
+        background-color:#cccccc;
+        display: grid;
+        width: fit-content;
+        height: fit-content;
+        grid-auto-columns: 1fr;
+        grid-auto-rows: 1fr;
+        --gap-x: var(--space-between-cells);
+        --gap-y: var(--space-between-cells);
+        gap: var(--gap-y) var(--gap-x);
+        font-family: "Courier New", monospace;
+        font-weight: bold;
+        img {
+            max-width: var(--img-size);
+            max-height: var(--img-size);
+        }
+    }
+
+    .cell, .editor-insert, .editor-edit {
+        grid-row-start: calc(1 + var(--y));
+        grid-row-end: span 1;
+        grid-column-start: calc(1 + var(--x));
+        grid-column-end: span 1;
+    }
+
+    .cell {
+        user-select: none;
+        aspect-ratio: 1;
+        display: flex;
+        position: relative;
+        pointer-events: none;
+
+        .cell-clip {
+            background-color: #dddddd;
+            aspect-ratio: inherit;
+            min-width:20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: clip;
+            /* clip-path applies here */
+            pointer-events: auto;
+        }
+
+        .cell-clip > div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        img.bomb {
+            z-index: 1;
+            pointer-events: none;
+            position: absolute;
+            transition: opacity 1s ease-in 0.4s, scale 1s linear 0.4s;
+            opacity: 0;
+            scale: 3;
+        }
+    }
+    .grid {
+        .cell.hidden img.bomb {
+            visibility: hidden;
+            opacity: 1;
+            scale: 1;
+        }
+        .cell.hidden .cell-clip {
+            background-color: #888888;
+        }
+        .cell.hidden .cell-clip:hover {
+            background-color: #aaaaaa;
+        }
+        .cell.hidden.adjhover .cell-clip {
+            background-color: #9999aa;
+        }
+
+        .cell.hidden.flagged .cell-clip {
+            background-color: #cc8888;
+        }
+        .cell.hidden.flagged .cell-clip:after {
+            content: "🚩";
+            position: absolute;
+            padding-left: 0.2em; /* flag is left-heavy */
+        }
+        .cell.hidden.flagged .cell-clip:hover {
+            background-color: #cc8888;
+        }
+        .cell.hidden.flagged.adjhover .cell-clip {
+            background-color: #dd9999;
+        }
+        .cell.hidden .cell-clip > div {
+            visibility: hidden;
+        }
+    }
+
+    .grid.hex, .grid.hexb {
+        grid-auto-columns: 1fr 1fr;
+        grid-auto-rows: 1fr 2fr;
+        --gap-y: calc(var(--space-between-cells) * sqrt(3));
+        --gap-x: var(--space-between-cells);
+
+        .cell {
+            grid-row-start: calc(1 + var(--y)*2);
+            grid-row-end: span 3;
+            grid-column-start: calc(1 + var(--x)*2 + mod(var(--y),2));
+            grid-column-end: span 2;
+        }
+        .editor-insert {
+            grid-row-start: calc(2 + var(--y)*2);
+            grid-column-start: calc(2 + var(--x)*2);
+        }
+        .editor-insert.col {
+            grid-column-start: calc(1 + var(--x)*2);
+            transform: none;
+        }
+        .editor-edit {
+            --x: calc(var(--cols) + 1);
+            --y: calc(max(var(--rows),3) + 1);
+            grid-row-start: calc(1 + var(--y)*2);
+            grid-column-start: calc(1 + var(--x)*2);
+        }
+        .row {
+            grid-row-end: span 3;
+        }
+        .col {
+            grid-column-end: span 2;
+        }
+        .cell {
+            aspect-ratio: calc(sqrt(3)/2);
+            .cell-clip {
+                clip-path: polygon(50% 0%, 0% 25%, 0% 75%, 50% 100%, 100% 75%, 100% 25%);
+            }
+        }
+    }
+    .grid.hexb .cell {
+        grid-column-start: calc(1 + var(--x)*2 + mod(var(--y) + 1,2));
+    }
+
+    .grid:has(.editor-edit) {
+        grid-template-columns: repeat(var(--cols), 1fr) repeat(2, auto) repeat(3, 1fr);
+        grid-template-rows: repeat(calc(max(var(--rows),3)), 1fr) repeat(2, auto);
+
+        .cell.hidden .cell-clip > div {
+            visibility: visible;
+            opacity: 50%;
+        }
+    }
+    .grid.hex:has(.editor-edit), .grid.hexb:has(.editor-edit) {
+        grid-template-columns: repeat(var(--cols), 1fr 1fr) 1fr repeat(2, auto) repeat(3, 1fr 1fr) 1fr;
+        grid-template-rows: repeat(calc(max(var(--rows),3)), 1fr 2fr) 1fr repeat(2, auto);
+        .sprites-display {
+            grid-column: calc(4 + 2*var(--cols)) / -1;
+        }
+    }
+    .grid {
+        .editor-insert {
+            align-self: start;
+            justify-self: start;
+            position: relative;
+            aspect-ratio: 1;
+        }
+        .editor-insert.col {
+            transform: translateX(-50%);
+            left: calc(-0.5 * var(--gap-x));
+        }
+        .editor-insert.row {
+            transform: translateY(-50%);
+            top: calc(-0.5 * var(--gap-y));
+        }
+        .editor-edit {
+            display: grid;
+            align-self: center;
+            justify-self: center;
+            align-items: stretch;
+            button {
+                aspect-ratio: 1;
+            }
+            .remove:after {
+                content: "-";
+            }
+        }
+        .editor-edit.col {
+            .shift-back:after {
+                content: "^";
+            }
+            .shift-forward:after {
+                content: "v";
+            }
+        }
+        .editor-edit.row {
+            grid-template-columns: 1fr 1fr 1fr;
+            .shift-back:after {
+                content: "<";
+            }
+            .shift-forward:after {
+                content: ">";
+            }
+        }
+    }
+    .sprites-display {
+        display: grid;
+        grid-template-rows: subgrid;
+        grid-template-columns: subgrid;
+        grid-column: calc(3 + var(--cols)) / -1;
+        grid-row: 1 / -1;
+        .cell {
+            grid-row: auto;
+            grid-column: auto;
+            aspect-ratio: auto;
         }
     }
 }
