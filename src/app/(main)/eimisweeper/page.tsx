@@ -4,6 +4,8 @@ import { Pos, Cell, BoardGeometry, BoardInfo, LiveBoard, EimisweeperGame, Eimisw
 import { updateContent, EditorButtons, gridOnClickEditor, gridOnContextmenuEditor, gridOnKeydownEditor } from "./editor"
 import { useState, useCallback, useRef, useEffect } from "react";
 
+const eimiueh_url = "/eimiueh.mp3";
+
 /// Global game settings
 /// Flagging and Chording can be disabled
 type EimisweeperSettings = {
@@ -97,17 +99,29 @@ function floodfill(cells: Cell[], queue: number[]): number[] {
 }
 
 /// Update cell visibility (and possibly win/loss state) by revealing cells in `idxs`
-function reveal(cells: Cell[], addMistake: ()=>void, idxs: number[]): Cell[] {
+function reveal(cells: Cell[], explode: ()=>void, addMistake: ()=>void, idxs: number[]): Cell[] {
   const revealed = floodfill(cells, idxs);
   const newCells = cells.map((cell, i) => {
     if (revealed.includes(i)) {
-      if (cell.isBomb) addMistake();
+      if (cell.isBomb) {
+        explode();
+        addMistake();
+      }
       return {...cell, hidden: false};
     } else return cell;
   });
   return newCells;
 }
 
+function playAudio({audioCtx, buffer}: AudioCtxWithBuf) {
+  if (audioCtx===null || buffer===null) return;
+  const source = audioCtx.createBufferSource();
+  source.buffer = buffer;
+  source.connect(audioCtx.destination);
+  source.start();
+}
+
+type AudioCtxWithBuf = {audioCtx: AudioContext|null, buffer: AudioBuffer|null}
 type GameStage = 'generating' | 'playing' | 'win' | 'lose'
 type SetGame = (game: EimisweeperGame | null) => void
 type SetBoard = (updater: (board: LiveBoard) => LiveBoard) => void
@@ -115,8 +129,9 @@ type RenderGameProps = {
   game: EimisweeperGame
   setGame: SetGame
   prefs: EimisweeperSettings
+  audio: React.MutableRefObject<AudioCtxWithBuf>
 }
-function RenderGame({ game, setGame, prefs }: RenderGameProps) {
+function RenderGame({ game, setGame, prefs, audio }: RenderGameProps) {
   const [board, setBoardOrig] = useState<LiveBoard>(game.board);
   // display used for sprites
   const [display, setDisplay] = useState<Record<string,string>>("display" in game.generator? (game.generator as EimisweeperPuzzleData).display as Record<string,string> : {});
@@ -157,6 +172,9 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
                                   /board.cells.filter(c=>!c.isBomb).length));
   const accuracy = Math.floor(100*Math.max(0, 1-(mistakes / board.info.totalMines)));
 
+  const explode = useCallback(()=>{
+    playAudio(audio.current);
+  }, []);
   // ----------------------------------------------------- Event handlers for grid
   // Reveal cells on click
   const gridOnClick = useCallback((e: React.MouseEvent) => {
@@ -166,18 +184,18 @@ function RenderGame({ game, setGame, prefs }: RenderGameProps) {
       const cell = board.cells[i];
       if (cell.flagged) return board; /* no-op; must unflag to reveal */
       else if (cell.hidden) { /* not flagged - reveal it */
-        return {...board, cells: reveal(board.cells, ()=>setMistakes(x=>x+1), [i])};
+        return {...board, cells: reveal(board.cells, explode, ()=>setMistakes(x=>x+1), [i])};
       } else { /* "chording" click on number with adjacent flags to clear rest */
         if (prefs.chording===true // TODO
             && 'number'===typeof cell.content
             && cell.content===cell.adj.filter((a)=>board.cells[a].flagged).length) {
-          return {...board, cells: reveal(board.cells, ()=>setMistakes(x=>x+1),
+          return {...board, cells: reveal(board.cells, explode, ()=>setMistakes(x=>x+1),
             cell.adj.filter((a)=>board.cells[a].hidden && !board.cells[a].flagged))};
         }
       }
       return board;
     });
-  }, [setBoard, setMistakes, prefs]);
+  }, [setBoard, setMistakes, prefs, explode]);
 
   // Flag or unflag
   const gridOnContextmenu = useCallback((e: React.MouseEvent)=>{
@@ -342,6 +360,16 @@ export default function Eimisweeper() {
   //  const puzzlesCompleted = localStorage.getItem("eimisweeper-puzzles-completed")
   //  setGameHistory(getHistoryFromStorage())
   //}, [])
+  // load SFX
+
+  const audio = useRef<AudioCtxWithBuf>({audioCtx: null, buffer: null});
+
+  useEffect(()=>{
+    const audioCtx = new AudioContext();
+    fetch(eimiueh_url).then(async resp=>audioCtx.decodeAudioData(await resp.arrayBuffer())).then((buf: AudioBuffer) => {
+      audio.current = {audioCtx: audioCtx, buffer: buf};
+    }).catch(err => console.log(err));
+  }, []);
 
   const [prefs, setPrefs] = useState<EimisweeperSettings>({"chording": true, "flagging": true});
   const [game, setGame] = useState<EimisweeperGame | null>(null);
@@ -359,7 +387,7 @@ export default function Eimisweeper() {
       <GeneratorSettings disabled={false} setGame={setGame} />
       <PuzzleChooser setGame={setGame} />
     </div>
-    {game===null?"":<RenderGame key={key} game={game} setGame={newGame} prefs={prefs} />}
+    {game===null?"":<RenderGame key={key} game={game} setGame={newGame} prefs={prefs} audio={audio} />}
   </div>
 }
 
