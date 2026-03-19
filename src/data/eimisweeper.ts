@@ -310,7 +310,7 @@ export function buildAdjacency(cells: Pos[], index: PosIndex, geom: BoardGeometr
       (p: Pos) => (p.x + p.y))
   }
   const adjacent: number[][] = [];
-  var i = 0;
+  let i = 0;
   for (const pos of cells) {
     let adj: number[] = [];
     const x = pos.x;
