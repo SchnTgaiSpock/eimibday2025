@@ -36,7 +36,8 @@ export default function Credits() {
             <p>
               Schn<br />
               Liquid Skelie<br />
-              MisterYura
+              MisterYura<br />
+              Vasher
             </p>
             <div className="row">
               <div className="col">
