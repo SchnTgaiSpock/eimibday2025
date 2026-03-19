@@ -117,7 +117,10 @@ function playAudio({audioCtx, buffer}: AudioCtxWithBuf) {
   if (audioCtx===null || buffer===null) return;
   const source = audioCtx.createBufferSource();
   source.buffer = buffer;
-  source.connect(audioCtx.destination);
+  const gainNode = audioCtx.createGain();
+  gainNode.gain.value = 0.5; // volume 50%
+  source.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
   source.start();
 }
 
@@ -339,7 +342,7 @@ type RenderWinLossProps = {
   start: number // time in ms
 }
 function RenderWinLoss({progress, accuracy, mistakes, undoCount, win, lose, start}: RenderWinLossProps) {
-  return <div className={"game-over-modal" + ((win||(lose&&mistakes===1))?"":" hidden") }>
+  return <div className={"game-over-modal" + (win?" win":(lose&&mistakes===1)?"":" hidden") }>
   <div>{win?"Solved!":lose?"It's over... [Undo] or [Restart]?":""}</div>
   <div>Undos: {undoCount}</div>
   {lose ? <div>progress: {progress}%</div> : <div>accuracy: {accuracy}%</div>}

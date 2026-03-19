@@ -952,7 +952,10 @@ nav {
         position: relative;
         height: 4lh;
         scale: 1 1;
-        transition: scale 0.5s ease 0.4s, height 0.5s ease 0.5s, opacity 0.5s linear 0.5s;
+        transition: scale 0.5s ease 0.9s, height 0.5s ease 1s, opacity 0.5s linear 1s;
+    }
+    .game-over-modal.win {
+        transition: scale 0.5s ease 0s, height 0.5s ease 0.1s, opacity 0.5s linear 0.1s;
     }
     .game-over-modal.hidden {
         user-select: none;
@@ -1025,7 +1028,7 @@ nav {
             z-index: 1;
             pointer-events: none;
             position: absolute;
-            transition: opacity 1s ease-in 0s, scale 1s linear 0s;
+            transition: opacity 1s ease-in 0.4s, scale 1s linear 0.4s;
             opacity: 0;
             scale: 3;
         }
