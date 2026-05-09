@@ -39,6 +39,12 @@ export default function Credits() {
               MisterYura<br />
               Vasher
             </p>
+            <p>
+              <strong>Art</strong>
+            </p>
+            <p>
+              Nateo<br />
+            </p>
             <div className="row">
               <div className="col">
                 <p>

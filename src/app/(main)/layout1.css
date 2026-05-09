@@ -87,14 +87,16 @@ nav {
     z-index: 3;
 
     .logo {
-        margin: 1rem 1rem;
         padding: 0;
         margin-right: auto;
         display: flex;
+        transform: rotate(8deg);
 
         img {
-            height: 90px;
-
+            width: 180px;
+            margin: 8px 16px;
+            top: 4px;
+            position: relative;
         }
     }
 
