@@ -3,7 +3,7 @@ import { ProfilePicture } from "./ProfilePicture";
 export function Navbar() {
   return <nav>
     <div className="nav-item logo">
-      <img src="/isami-industries.svg" alt="Isami Industries" />
+      <img src="/ISAMIindustries_logo_downscaled.png" alt="Isami Industries" />
     </div>
     <div className="nav-item">
       <div className="profile-picture-background">
